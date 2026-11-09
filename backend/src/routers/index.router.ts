@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { router as authRouter } from './auth.router.js';
+
+export const router = Router();
+
+router.get('/health', (_req, res) => {
+  res.status(200).json({ data: { status: 'ok' } });
+});
+
+router.use('/auth', authRouter);
