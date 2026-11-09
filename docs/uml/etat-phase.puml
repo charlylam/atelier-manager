@@ -1,0 +1,9 @@
+@startuml
+title États d'une phase
+
+[*] --> todo
+todo --> in_progress : démarrer
+in_progress --> done : terminer
+in_progress --> todo : remettre à faire
+done --> in_progress : rouvrir\n[chantier ni ready, ni delivered]
+@enduml

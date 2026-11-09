@@ -1,0 +1,25 @@
+{
+  "name": "atelier-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Application web de gestion d’atelier : clients, devis, chantiers et phases de fabrication.",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charlylam/atelier-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/charlylam/atelier-manager/issues"
+  },
+  "homepage": "https://github.com/charlylam/atelier-manager#readme",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10"
+  }
+}

@@ -1,0 +1,75 @@
+@startuml
+title Accepter un devis puis créer le chantier
+
+actor Membre
+participant "Navigateur\n(React)" as UI
+participant "Serveur Next.js\n(Route Handler)" as Next
+participant "API Express\n(middleware, validateur,\ncontrôleur)" as API
+participant "Service" as S
+database "PostgreSQL" as DB
+
+== Accepter le devis ==
+Membre -> UI : Clique sur « Accepter »
+UI -> Next : PATCH /api/quotes/{id}/status\n{ "status": "accepted" }
+Next -> Next : Lit le cookie httpOnly
+Next -> API : PATCH /api/quotes/{id}/status\nAuthorization: Bearer <JWT>
+API -> API : Vérifie le JWT\n(userId, workshopId, role)
+API -> API : Valide le corps (Zod, parse)
+API -> S : changeQuoteStatus(workshopId, id, "accepted")
+S -> DB : findFirst({ id, workshopId })
+
+alt Devis introuvable ou d'un autre atelier
+  DB --> S : null
+  S --> API : NotFoundError
+  API --> Next : 404 { error }
+else Date de validité dépassée
+  S -> DB : status = expired
+  S --> API : ConflictError
+  API --> Next : 409 { error }
+else Devis trouvé
+  S -> DB : updateMany({ id, workshopId, status: "sent" })\n-> status = accepted
+  alt count = 0 (le devis n'est pas "sent")
+    S --> API : ConflictError
+    API --> Next : 409 { error }
+  else count = 1
+    S --> API : devis mis à jour
+    API --> Next : 200 { data }
+  end
+end
+Next --> UI : Résultat
+UI --> Membre : Nouveau statut ou message d'erreur
+
+== Créer le chantier ==
+Membre -> UI : Clique sur « Créer le chantier »
+UI -> Next : POST /api/worksites { "quoteId": id }
+Next -> API : POST /api/worksites\nAuthorization: Bearer <JWT>
+API -> S : createWorksiteFromQuote(tx, workshopId, quoteId)
+S -> DB : BEGIN
+S -> DB : findFirst devis ({ id, workshopId })
+
+alt Devis introuvable
+  S -> DB : ROLLBACK
+  S --> API : NotFoundError
+  API --> Next : 404 { error }
+else Statut différent de "accepted"
+  S -> DB : ROLLBACK
+  S --> API : ConflictError
+  API --> Next : 409 { error }
+else Devis accepté
+  S -> DB : Cherche un chantier pour ce quoteId
+  alt Chantier déjà créé
+    S -> DB : COMMIT
+    S --> API : chantier existant
+    API --> Next : 200 { data }
+  else Aucun chantier
+    S -> DB : Calcule la référence
+    S -> DB : Crée le chantier\n(client et titre repris du devis)
+    S -> DB : Crée les phases par défaut\n(estimated_hours = 0)
+    S -> DB : COMMIT
+    S --> API : nouveau chantier
+    API --> Next : 201 { data }
+  end
+end
+Next --> UI : Résultat
+UI --> Membre : Redirection vers la fiche chantier ou message d'erreur
+@enduml

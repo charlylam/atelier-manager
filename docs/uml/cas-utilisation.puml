@@ -1,0 +1,78 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Visiteur
+actor Membre
+actor Admin
+
+Admin --|> Membre
+
+rectangle "Atelier Manager" {
+
+  package "Compte et atelier" {
+    usecase "Créer un compte\net un atelier" as UC1
+    usecase "Se connecter" as UC2
+    usecase "Se déconnecter" as UC3
+    usecase "Ajouter un membre" as UC4
+    usecase "Retirer un membre" as UC5
+  }
+
+  package "Clients" {
+    usecase "Gérer les clients\n(créer, modifier, supprimer)" as UC6
+    usecase "Rechercher un client" as UC8
+    usecase "Consulter l'historique\nd'un client" as UC9
+  }
+
+  package "Devis" {
+    usecase "Créer un devis" as UC11
+    usecase "Gérer les lignes du devis" as UC12
+    usecase "Calculer les totaux" as UC13
+    usecase "Envoyer un devis" as UC14
+    usecase "Accepter ou refuser\nun devis" as UC15
+    usecase "Dupliquer un devis" as UC16
+    usecase "Télécharger le PDF" as UC17
+  }
+
+  package "Commandes et fabrication" {
+    usecase "Créer un chantier\nà partir d'un devis" as UC18
+    usecase "Gérer les phases\ndu chantier" as UC20
+    usecase "Suivre le temps passé" as UC22
+    usecase "Changer le statut\nd'un chantier" as UC23
+    usecase "Annuler un chantier" as UC24
+  }
+
+  package "Tableau de bord" {
+    usecase "Consulter le tableau\nde bord" as UC25
+  }
+}
+
+Visiteur --> UC1
+Visiteur --> UC2
+
+Membre --> UC3
+Membre --> UC6
+Membre --> UC8
+Membre --> UC9
+Membre --> UC11
+Membre --> UC12
+Membre --> UC14
+Membre --> UC15
+Membre --> UC16
+Membre --> UC17
+Membre --> UC18
+Membre --> UC20
+Membre --> UC22
+Membre --> UC23
+Membre --> UC24
+Membre --> UC25
+
+Admin --> UC4
+Admin --> UC5
+
+UC12 ..> UC13 : <<include>>
+UC17 ..> UC13 : <<include>>
+UC18 ..> UC15 : <<include>>
+UC9 ..> UC8 : <<extend>>
+
+@enduml

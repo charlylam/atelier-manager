@@ -1,0 +1,20 @@
+@startuml
+title États d'un chantier
+
+[*] --> pending : création depuis un devis accepté
+
+pending --> in_production : démarrer
+in_production --> ready : terminer\n[toutes les phases done]
+ready --> delivered : livrer
+
+pending --> canceled : annuler
+in_production --> canceled : annuler
+ready --> canceled : annuler
+
+delivered --> [*]
+canceled --> [*]
+
+note right of delivered
+  Ne peut plus être annulé
+end note
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+title États d'un devis
+
+[*] --> draft : création
+
+draft --> sent : envoyer\n[au moins une ligne]
+sent --> accepted : accepter
+sent --> rejected : refuser
+sent --> expired : date de validité dépassée\n(vérifiée à la consultation\net à l'acceptation)
+
+accepted --> [*]
+rejected --> [*]
+expired --> [*]
+
+note right of draft
+  Seul état modifiable
+  (lignes, titre, client)
+end note
+
+note right of accepted
+  Un seul chantier peut
+  être créé à partir du devis
+end note
+@enduml
