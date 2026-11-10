@@ -9,6 +9,8 @@ import {
   searchQuotes,
   transitionQuote,
 } from '../services/quote.service.js';
+import { duplicateQuote } from '../services/quote-duplicate.service.js';
+import { buildQuotePdf } from '../services/quote-pdf.service.js';
 import {
   createLineBodySchema,
   createQuoteBodySchema,
@@ -94,4 +96,29 @@ export async function removeQuoteLine(req: Request, res: Response) {
   const quote = await deleteLine(workshopId, id, lineId);
 
   return res.status(200).json({ data: quote });
+}
+
+export async function copyQuote(req: Request, res: Response) {
+  const { workshopId } = req.user!;
+  const { id } = quoteIdParamSchema.parse(req.params);
+
+  const quote = await duplicateQuote(workshopId, id);
+
+  return res.status(201).json({ data: quote });
+}
+
+export async function downloadQuotePdf(req: Request, res: Response) {
+  const { workshopId } = req.user!;
+  const { id } = quoteIdParamSchema.parse(req.params);
+
+  const { reference, buffer } = await buildQuotePdf(workshopId, id);
+
+  return res
+    .status(200)
+    .set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${reference}.pdf"`,
+      'Content-Length': String(buffer.length),
+    })
+    .send(buffer);
 }

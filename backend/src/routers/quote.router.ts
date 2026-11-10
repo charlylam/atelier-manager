@@ -2,6 +2,8 @@ import { Router } from 'express';
 import {
   addQuote,
   addQuoteLine,
+  copyQuote,
+  downloadQuotePdf,
   getQuote,
   listQuotes,
   removeQuoteLine,
@@ -24,3 +26,5 @@ router.patch('/:id/status', updateQuoteStatus);
 router.post('/:id/lines', addQuoteLine);
 router.patch('/:id/lines/:lineId', updateQuoteLine);
 router.delete('/:id/lines/:lineId', removeQuoteLine);
+router.post('/:id/duplicate', copyQuote);
+router.get('/:id/pdf', downloadQuotePdf);
