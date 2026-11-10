@@ -424,6 +424,7 @@ async function main() {
       title: "Porte d'entrée vitrée",
       siteAddress: '3 impasse des Artisans, 01100 Oyonnax',
       status: WorksiteStatus.delivered,
+      deliveredAt: new Date('2026-09-30T10:00:00.000Z'),
       dueDate: day('2026-09-30'),
       phases: worksitePhases([
         {

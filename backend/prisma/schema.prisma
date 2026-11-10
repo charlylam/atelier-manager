@@ -147,6 +147,8 @@ model Worksite {
   siteAddress String?        @map("site_address")
   status      WorksiteStatus @default(pending)
   dueDate     DateTime?      @map("due_date") @db.Date
+  // Date réelle de livraison : base du chiffre d'affaires du mois.
+  deliveredAt DateTime?      @map("delivered_at") @db.Timestamptz
   createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz
   updatedAt   DateTime       @updatedAt @map("updated_at") @db.Timestamptz
   phases      Phase[]

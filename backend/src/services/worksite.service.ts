@@ -363,7 +363,11 @@ export async function transitionWorksite(
     // donc un changement de phase simultané attend puis voit le nouveau statut.
     const { count } = await tx.worksite.updateMany({
       where: { id, workshopId, status: worksite.status },
-      data: { status: target },
+      data: {
+        status: target,
+        // Date de livraison : base du chiffre d'affaires du mois.
+        ...(target === WorksiteStatus.delivered && { deliveredAt: new Date() }),
+      },
     });
 
     if (count === 0) {
