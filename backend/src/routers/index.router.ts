@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { router as authRouter } from './auth.router.js';
+import { router as clientRouter } from './client.router.js';
 
 export const router = Router();
 
@@ -8,3 +9,4 @@ router.get('/health', (_req, res) => {
 });
 
 router.use('/auth', authRouter);
+router.use('/clients', clientRouter);
