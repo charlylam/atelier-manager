@@ -97,7 +97,7 @@ function presentSummary(quote: QuoteSummary) {
   };
 }
 
-async function getQuoteDetail(db: Db, workshopId: number, id: number) {
+export async function getQuoteDetail(db: Db, workshopId: number, id: number) {
   const quote = await db.quote.findFirst({
     where: { id, workshopId },
     select: quoteDetailSelect,
@@ -116,7 +116,7 @@ async function getQuoteDetail(db: Db, workshopId: number, id: number) {
 
 // Un devis envoyé dont la date de validité est dépassée devient "expired".
 // Vérifié à la consultation : il n'y a pas de tâche planifiée.
-async function expireOverdueQuotes(db: Db, workshopId: number) {
+export async function expireOverdueQuotes(db: Db, workshopId: number) {
   await db.quote.updateMany({
     where: {
       workshopId,
@@ -167,7 +167,11 @@ async function assertClientInWorkshop(
 }
 
 // Référence suivante dans l'atelier pour l'année : DEV-2026-0001, 0002...
-async function nextQuoteReference(db: Db, workshopId: number, year: number) {
+export async function nextQuoteReference(
+  db: Db,
+  workshopId: number,
+  year: number
+) {
   const prefix = `${REFERENCE_PREFIX}${year}-`;
   const last = await db.quote.findFirst({
     where: { workshopId, reference: { startsWith: prefix } },
