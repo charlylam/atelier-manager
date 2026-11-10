@@ -165,18 +165,29 @@ describe('Devis', () => {
 
   describe('GET /api/quotes', () => {
     it('filtre par statut', async () => {
+      // limit=100 : d'autres tests créent des devis acceptés à chaque exécution.
       const { status, body } = await send<ListResult>(
         'GET',
-        '/api/quotes?status=accepted',
+        '/api/quotes?status=accepted&limit=100',
         { token: martin }
       );
 
       assert.equal(status, 200);
       assert.ok(body.data.length >= 2);
       assert.ok(body.data.every((quote) => quote.status === 'accepted'));
-      const references = body.data.map((quote) => quote.reference);
-      assert.ok(references.includes('DEV-2026-0001'));
-      assert.ok(references.includes('DEV-2026-0006'));
+    });
+
+    it('retrouve les devis acceptés du jeu d’essai par leur référence', async () => {
+      for (const reference of ['DEV-2026-0001', 'DEV-2026-0006']) {
+        const { body } = await send<ListResult>(
+          'GET',
+          `/api/quotes?status=accepted&search=${reference}`,
+          { token: martin }
+        );
+
+        assert.equal(body.meta.total, 1);
+        assert.equal(body.data[0].reference, reference);
+      }
     });
 
     it('cherche par référence', async () => {

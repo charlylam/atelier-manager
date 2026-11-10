@@ -10,7 +10,7 @@ export const ACCOUNTS = {
   },
 } as const;
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+type Method = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
 export async function send<T>(
   method: Method,
@@ -32,7 +32,14 @@ export async function send<T>(
 
   // Une réponse 204 n'a pas de corps.
   const text = await res.text();
-  const body = (text ? JSON.parse(text) : undefined) as T;
+  let body: T;
+  try {
+    body = (text ? JSON.parse(text) : undefined) as T;
+  } catch {
+    throw new Error(
+      `Réponse non JSON (${res.status}) sur ${method} ${path} : ${text.slice(0, 120)}`
+    );
+  }
   return { status: res.status, body };
 }
 
