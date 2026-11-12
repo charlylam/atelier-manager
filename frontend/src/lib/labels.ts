@@ -53,3 +53,14 @@ export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   rejected: 'Refusé',
   expired: 'Expiré',
 };
+
+// Type d'une ligne de devis.
+export const QUOTE_LINE_TYPE_LABELS: Record<
+  'material' | 'labor' | 'service' | 'other',
+  string
+> = {
+  material: 'Matériau',
+  labor: 'Main-d’œuvre',
+  service: 'Prestation',
+  other: 'Autre',
+};
