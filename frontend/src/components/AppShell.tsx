@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
-import { redirect } from 'next/navigation';
 import { getMe } from '@/lib/api';
-import { ApiError } from '@/lib/errors';
+import { orLogin } from '@/lib/session-guard';
 import { LogoutButton } from './LogoutButton';
 
 const ROLE_LABELS = { admin: 'Administrateur', member: 'Membre' } as const;
@@ -10,25 +9,16 @@ const ROLE_LABELS = { admin: 'Administrateur', member: 'Membre' } as const;
 // l'utilisateur et son atelier. Le filtre d'accès (proxy.ts) ne regarde que la
 // présence du cookie : un jeton expiré ou falsifié est refusé ici, par l'API.
 export async function AppShell({ children }: { children: ReactNode }) {
-  let user;
-
-  try {
-    user = await getMe();
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 401) {
-      redirect('/connexion?session=expiree');
-    }
-    throw error;
-  }
+  const user = await orLogin(getMe());
 
   return (
     <>
-      <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-3">
+      <header className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 px-6 py-3">
         <p className="font-semibold">{user.workshop.name}</p>
         <div className="flex items-center gap-4 text-sm">
           <p>
             {user.firstName} {user.lastName}
-            <span className="ml-2 text-neutral-600">
+            <span className="ml-2 text-neutral-600 dark:text-neutral-400">
               ({ROLE_LABELS[user.role]})
             </span>
           </p>

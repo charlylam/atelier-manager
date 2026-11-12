@@ -68,7 +68,7 @@ export function LoginForm({ redirectTo, sessionExpired = false }: Props) {
           type="email"
           required
           autoComplete="email"
-          className="rounded-md border border-neutral-300 px-3 py-2 text-base font-normal"
+          className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-base font-normal"
         />
       </label>
 
@@ -79,7 +79,7 @@ export function LoginForm({ redirectTo, sessionExpired = false }: Props) {
           type="password"
           required
           autoComplete="current-password"
-          className="rounded-md border border-neutral-300 px-3 py-2 text-base font-normal"
+          className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-base font-normal"
         />
       </label>
 
