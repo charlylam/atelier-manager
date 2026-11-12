@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { messageForCode } from '@/lib/messages';
 
 const FIELD_CLASS =
-  'rounded-md border border-neutral-300 px-3 py-2 text-base font-normal';
+  'rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-base font-normal';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -111,7 +111,7 @@ export function RegisterForm() {
           autoComplete="new-password"
           className={FIELD_CLASS}
         />
-        <span className="text-xs font-normal text-neutral-600">
+        <span className="text-xs font-normal text-neutral-600 dark:text-neutral-400">
           8 caractères au moins, dont une majuscule et un caractère spécial.
         </span>
       </label>

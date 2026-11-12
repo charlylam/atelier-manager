@@ -25,7 +25,7 @@ export function LogoutButton() {
       type="button"
       onClick={handleClick}
       disabled={pending}
-      className="rounded-md border border-neutral-300 px-3 py-1 text-sm disabled:opacity-60"
+      className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm disabled:opacity-60"
     >
       Se déconnecter
     </button>
