@@ -44,3 +44,12 @@ export const QUOTE_STATUS_COUNT_LABELS: Record<QuoteStatus, string> = {
   rejected: 'Refusés',
   expired: 'Expirés',
 };
+
+// Au singulier : statut d'un devis donné.
+export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
+  draft: 'Brouillon',
+  sent: 'Envoyé',
+  accepted: 'Accepté',
+  rejected: 'Refusé',
+  expired: 'Expiré',
+};
