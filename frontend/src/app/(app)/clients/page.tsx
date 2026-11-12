@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { ClientSearch } from '@/components/clients/ClientSearch';
 import { ClientsTable } from '@/components/clients/ClientsTable';
 import { Pagination } from '@/components/Pagination';
@@ -18,7 +19,15 @@ export default function ClientsPage({
 }) {
   return (
     <>
-      <h1 className="text-2xl font-semibold">Clients</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Clients</h1>
+        <Link
+          href="/clients/nouveau"
+          className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-medium text-white"
+        >
+          Nouveau client
+        </Link>
+      </div>
       <Suspense
         fallback={
           <p className="mt-4 text-neutral-600 dark:text-neutral-400">

@@ -1,10 +1,13 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ClientDetailView } from '@/components/clients/ClientDetailView';
+import { DeleteClientForm } from '@/components/clients/DeleteClientForm';
 import { getClient } from '@/lib/clients';
 import { ApiError } from '@/lib/errors';
 import { parseId } from '@/lib/params';
 import { orLogin } from '@/lib/session-guard';
+import { deleteClientAction } from '../actions';
 
 type Params = Promise<{ id: string }>;
 
@@ -38,5 +41,23 @@ async function ClientContent({ params }: { params: Params }) {
     throw error;
   }
 
-  return <ClientDetailView client={client} />;
+  return (
+    <ClientDetailView
+      client={client}
+      actions={
+        <Link
+          href={`/clients/${client.id}/modifier`}
+          className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm"
+        >
+          Modifier
+        </Link>
+      }
+      footer={
+        <DeleteClientForm
+          action={deleteClientAction.bind(null, client.id)}
+          clientName={client.name}
+        />
+      }
+    />
+  );
 }

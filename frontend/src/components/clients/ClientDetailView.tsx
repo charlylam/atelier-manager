@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { formatDate } from '@/lib/format';
 import { QUOTE_STATUS_LABELS, WORKSITE_STATUS_LABELS } from '@/lib/labels';
@@ -5,7 +6,13 @@ import type { ClientDetail } from '@/lib/clients';
 
 const EMPTY = '—';
 
-export function ClientDetailView({ client }: { client: ClientDetail }) {
+type Props = {
+  client: ClientDetail;
+  actions?: ReactNode; // à côté du nom (modifier)
+  footer?: ReactNode; // en bas de page (supprimer)
+};
+
+export function ClientDetailView({ client, actions, footer }: Props) {
   return (
     <>
       <p className="text-sm">
@@ -22,6 +29,7 @@ export function ClientDetailView({ client }: { client: ClientDetail }) {
         <span className="rounded-full bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 text-sm">
           {client.isCompany ? 'Entreprise' : 'Particulier'}
         </span>
+        {actions && <div className="ml-auto">{actions}</div>}
       </div>
 
       <section aria-labelledby="contact-heading" className="mt-6">
@@ -151,6 +159,8 @@ export function ClientDetailView({ client }: { client: ClientDetail }) {
           </table>
         )}
       </section>
+
+      {footer && <div className="mt-10">{footer}</div>}
     </>
   );
 }
