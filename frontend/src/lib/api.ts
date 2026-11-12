@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { ApiError } from './errors';
+import type { ApiErrorDetail } from './errors';
 import { SESSION_COOKIE } from './constants';
 
 // Utilisateur renvoyé par GET /api/auth/me.
@@ -22,8 +23,8 @@ function apiUrl() {
 
 /**
  * Appel de l'API sans jeton (inscription, connexion).
- * Une réponse en erreur lève une ApiError qui porte le statut et le code de l'API ;
- * une API injoignable lève une ApiError 503.
+ * Une réponse en erreur lève une ApiError qui porte le statut, le code et, pour une
+ * erreur de validation, le détail des champs ; une API injoignable lève une ApiError 503.
  */
 export async function apiFetch<T = unknown>(
   endpoint: string,
@@ -39,7 +40,15 @@ export async function apiFetch<T = unknown>(
   }
 
   if (!response.ok) {
-    let body: { error?: { code?: string; message?: string } } | undefined;
+    let body:
+      | {
+          error?: {
+            code?: string;
+            message?: string;
+            details?: ApiErrorDetail[];
+          };
+        }
+      | undefined;
     try {
       body = await response.json();
     } catch {
@@ -51,7 +60,8 @@ export async function apiFetch<T = unknown>(
     throw new ApiError(
       body?.error?.message ?? `Erreur API : ${response.status}`,
       response.status,
-      body?.error?.code
+      body?.error?.code,
+      body?.error?.details
     );
   }
 
