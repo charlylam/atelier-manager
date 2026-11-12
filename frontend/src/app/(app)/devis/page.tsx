@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { QuoteSearch } from '@/components/quotes/QuoteSearch';
 import { QuoteStatusFilter } from '@/components/quotes/QuoteStatusFilter';
 import { QuotesTable } from '@/components/quotes/QuotesTable';
@@ -21,7 +22,15 @@ export default function QuotesPage({
 }) {
   return (
     <>
-      <h1 className="text-2xl font-semibold">Devis</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Devis</h1>
+        <Link
+          href="/devis/nouveau"
+          className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-medium text-white"
+        >
+          Nouveau devis
+        </Link>
+      </div>
       <Suspense
         fallback={
           <p className="mt-4 text-neutral-600 dark:text-neutral-400">

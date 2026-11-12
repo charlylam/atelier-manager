@@ -7,18 +7,24 @@ import {
   formatQuantity,
 } from '@/lib/format';
 import { QUOTE_LINE_TYPE_LABELS } from '@/lib/labels';
-import type { Quote } from '@/lib/quotes';
+import type { Quote, QuoteLine } from '@/lib/quotes';
 import { QuoteStatusBadge } from './QuoteStatusBadge';
 
 const EMPTY = '—';
 
+type Props = {
+  quote: Quote;
+  actions?: ReactNode; // à côté du titre (modifier, télécharger le PDF)
+  lineActions?: (line: QuoteLine) => ReactNode; // dernière colonne du tableau des lignes
+  linesFooter?: ReactNode; // sous les totaux (ajouter une ligne)
+};
+
 export function QuoteDetailView({
   quote,
   actions,
-}: {
-  quote: Quote;
-  actions?: ReactNode; // à côté du titre (télécharger le PDF)
-}) {
+  lineActions,
+  linesFooter,
+}: Props) {
   return (
     <>
       <p className="text-sm">
@@ -32,7 +38,9 @@ export function QuoteDetailView({
           <span className="font-mono">{quote.reference}</span> · {quote.title}
         </h1>
         <QuoteStatusBadge status={quote.status} />
-        {actions && <div className="ml-auto">{actions}</div>}
+        {actions && (
+          <div className="ml-auto flex items-center gap-2">{actions}</div>
+        )}
       </div>
 
       <dl className="mt-6 grid max-w-xl grid-cols-[9rem_1fr] gap-y-2 text-sm">
@@ -79,9 +87,14 @@ export function QuoteDetailView({
                 <th scope="col" className="py-2 pr-3 text-right">
                   TVA
                 </th>
-                <th scope="col" className="py-2 text-right">
+                <th scope="col" className="py-2 pr-3 text-right">
                   Total HT
                 </th>
+                {lineActions && (
+                  <th scope="col" className="py-2 text-right">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -105,9 +118,12 @@ export function QuoteDetailView({
                   <td className="py-2 pr-3 text-right">
                     {formatPercent(line.vatRate)}
                   </td>
-                  <td className="py-2 text-right">
+                  <td className="py-2 pr-3 text-right">
                     {formatMoney(line.totalExclTax)}
                   </td>
+                  {lineActions && (
+                    <td className="py-2 text-right">{lineActions(line)}</td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -126,6 +142,8 @@ export function QuoteDetailView({
             {formatMoney(quote.totals.totalInclTax)}
           </dd>
         </dl>
+
+        {linesFooter && <div className="mt-8">{linesFooter}</div>}
       </section>
     </>
   );
