@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { getMe } from '@/lib/api';
 import { orLogin } from '@/lib/session-guard';
 import { LogoutButton } from './LogoutButton';
+import { NavLinks } from './NavLinks';
 
 const ROLE_LABELS = { admin: 'Administrateur', member: 'Membre' } as const;
 
@@ -13,8 +14,11 @@ export async function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <header className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 px-6 py-3">
-        <p className="font-semibold">{user.workshop.name}</p>
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 dark:border-neutral-800 px-6 py-3">
+        <div className="flex items-center gap-6">
+          <p className="font-semibold">{user.workshop.name}</p>
+          <NavLinks />
+        </div>
         <div className="flex items-center gap-4 text-sm">
           <p>
             {user.firstName} {user.lastName}
