@@ -41,13 +41,15 @@ export type Pagination = {
   totalPages: number;
 };
 
-/** Page de clients de l'atelier, triés par nom. */
+/** Page de clients de l'atelier, triés par nom. `limit` (100 au plus) sert aux listes de choix. */
 export async function listClients({
   search,
   page = 1,
+  limit,
 }: {
   search?: string;
   page?: number;
+  limit?: number;
 } = {}) {
   const params = new URLSearchParams();
   if (search) {
@@ -55,6 +57,9 @@ export async function listClients({
   }
   if (page > 1) {
     params.set('page', String(page));
+  }
+  if (limit) {
+    params.set('limit', String(limit));
   }
 
   const query = params.toString();
