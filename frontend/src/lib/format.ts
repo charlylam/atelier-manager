@@ -17,3 +17,15 @@ export function formatDate(isoDate: string) {
   const [year, month, day] = isoDate.slice(0, 10).split('-');
   return `${day}/${month}/${year}`;
 }
+
+const QUANTITY = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
+
+/** "6.00" devient "6", "1.50" devient "1,5" : les zéros inutiles sont retirés. */
+export function formatQuantity(value: string) {
+  return QUANTITY.format(Number(value));
+}
+
+/** "20.00" devient "20 %". */
+export function formatPercent(value: string) {
+  return `${QUANTITY.format(Number(value))} %`;
+}

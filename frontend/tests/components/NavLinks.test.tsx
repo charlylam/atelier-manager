@@ -22,6 +22,9 @@ describe('NavLinks', () => {
     expect(screen.getByRole('link', { name: 'Clients' })).not.toHaveAttribute(
       'aria-current'
     );
+    expect(screen.getByRole('link', { name: 'Devis' })).not.toHaveAttribute(
+      'aria-current'
+    );
   });
 
   it('garde « Clients » actif sur la fiche d’un client', () => {
@@ -31,6 +34,19 @@ describe('NavLinks', () => {
     expect(screen.getByRole('link', { name: 'Clients' })).toHaveAttribute(
       'aria-current',
       'page'
+    );
+  });
+
+  it('garde « Devis » actif sur la fiche d’un devis', () => {
+    navigation.usePathname.mockReturnValue('/devis/7');
+    render(<NavLinks />);
+
+    expect(screen.getByRole('link', { name: 'Devis' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByRole('link', { name: 'Clients' })).not.toHaveAttribute(
+      'aria-current'
     );
   });
 });
