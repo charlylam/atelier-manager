@@ -68,9 +68,11 @@ export function ClientForm({
   );
   const { values, fieldErrors } = state;
 
-  // Attributs d'un champ en erreur. Après un envoi, React remet les champs à leur valeur
-  // par défaut : on y place les valeurs renvoyées par l'action, pour que la saisie ne soit
-  // pas perdue quand le serveur refuse.
+  // Après un envoi, React remet les champs à leur valeur par défaut : on y place les valeurs
+  // renvoyées par l'action, pour que la saisie ne soit pas perdue quand le serveur refuse.
+  // Le <select> porte une clé : React ne met pas à jour le choix d'une liste déroulante par
+  // `defaultValue` après un envoi (contrairement aux champs de texte), donc on le recrée
+  // quand l'action renvoie une autre valeur.
   function invalid(field: ClientField, id: string) {
     return fieldErrors[field]
       ? { 'aria-invalid': true as const, 'aria-describedby': `${id}-error` }
@@ -108,6 +110,7 @@ export function ClientForm({
         <select
           id="client-type"
           name="isCompany"
+          key={values.isCompany}
           defaultValue={values.isCompany}
           {...invalid('isCompany', 'client-type')}
           className={FIELD_CLASS}
