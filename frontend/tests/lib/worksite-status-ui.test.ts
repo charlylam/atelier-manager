@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   WORKSITE_STATUS_CHANGES,
+  canEditPhases,
   canEditWorksite,
   worksiteStatusChangesFor,
 } from '@/lib/worksite-status-ui';
@@ -41,6 +42,16 @@ describe('canEditWorksite', () => {
     expect(canEditWorksite('ready')).toBe(true);
     expect(canEditWorksite('delivered')).toBe(false);
     expect(canEditWorksite('canceled')).toBe(false);
+  });
+});
+
+describe('canEditPhases', () => {
+  it('autorise l’ajout et la suppression de phases en attente et en fabrication seulement', () => {
+    expect(canEditPhases('pending')).toBe(true);
+    expect(canEditPhases('in_production')).toBe(true);
+    expect(canEditPhases('ready')).toBe(false);
+    expect(canEditPhases('delivered')).toBe(false);
+    expect(canEditPhases('canceled')).toBe(false);
   });
 });
 

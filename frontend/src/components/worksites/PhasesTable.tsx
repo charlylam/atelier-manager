@@ -1,15 +1,17 @@
+import type { ReactNode } from 'react';
 import { formatQuantity } from '@/lib/format';
 import { PHASE_STATUS_LABELS } from '@/lib/labels';
-import type { Worksite } from '@/lib/worksites';
+import type { Phase, Worksite } from '@/lib/worksites';
 
 const EMPTY = '—';
 
 const hours = (value: string) => `${formatQuantity(value)} h`;
 
-export function PhasesTable({
-  phases,
-  totals,
-}: Pick<Worksite, 'phases' | 'totals'>) {
+type Props = Pick<Worksite, 'phases' | 'totals'> & {
+  phaseActions?: (phase: Phase) => ReactNode; // dernière colonne du tableau (supprimer)
+};
+
+export function PhasesTable({ phases, totals, phaseActions }: Props) {
   if (phases.length === 0) {
     return (
       <p className="mt-3 text-neutral-600 dark:text-neutral-400">
@@ -36,9 +38,14 @@ export function PhasesTable({
             <th scope="col" className="py-2 pr-3 text-right">
               Heures réelles
             </th>
-            <th scope="col" className="py-2">
+            <th scope="col" className="py-2 pr-3">
               Notes
             </th>
+            {phaseActions && (
+              <th scope="col" className="py-2 text-right">
+                <span className="sr-only">Actions</span>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -60,9 +67,12 @@ export function PhasesTable({
               <td className="py-2 pr-3 text-right">
                 {hours(phase.actualHours)}
               </td>
-              <td className="py-2 whitespace-pre-line">
+              <td className="py-2 pr-3 whitespace-pre-line">
                 {phase.notes ?? EMPTY}
               </td>
+              {phaseActions && (
+                <td className="py-2 text-right">{phaseActions(phase)}</td>
+              )}
             </tr>
           ))}
         </tbody>

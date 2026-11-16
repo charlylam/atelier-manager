@@ -1,13 +1,17 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { DeletePhaseForm } from '@/components/worksites/DeletePhaseForm';
+import { PhaseForm } from '@/components/worksites/PhaseForm';
 import { WorksiteDetailView } from '@/components/worksites/WorksiteDetailView';
 import { WorksiteStatusPanel } from '@/components/worksites/WorksiteStatusPanel';
 import { ApiError } from '@/lib/errors';
 import { parseId } from '@/lib/params';
+import { EMPTY_PHASE_VALUES } from '@/lib/phase-form';
 import { orLogin } from '@/lib/session-guard';
-import { canEditWorksite } from '@/lib/worksite-status-ui';
+import { canEditPhases, canEditWorksite } from '@/lib/worksite-status-ui';
 import { getWorksite } from '@/lib/worksites';
+import { addPhaseAction, deletePhaseAction } from '../phase-actions';
 import { changeWorksiteStatusAction } from '../status-actions';
 
 type Params = Promise<{ id: string }>;
@@ -42,6 +46,9 @@ async function WorksiteContent({ params }: { params: Params }) {
     throw error;
   }
 
+  // L'API refuse (409) l'ajout et la suppression de phases hors des statuts en attente et en fabrication.
+  const phasesEditable = canEditPhases(worksite.status);
+
   return (
     <WorksiteDetailView
       worksite={worksite}
@@ -54,6 +61,33 @@ async function WorksiteContent({ params }: { params: Params }) {
             Modifier
           </Link>
         )
+      }
+      phaseActions={
+        phasesEditable
+          ? (phase) => (
+              <DeletePhaseForm
+                action={deletePhaseAction.bind(null, worksite.id, phase.id)}
+                name={phase.name}
+              />
+            )
+          : undefined
+      }
+      phasesFooter={
+        phasesEditable ? (
+          <section aria-labelledby="add-phase-heading">
+            <h3 id="add-phase-heading" className="text-base font-semibold">
+              Ajouter une phase
+            </h3>
+            <div className="mt-3">
+              <PhaseForm
+                action={addPhaseAction.bind(null, worksite.id)}
+                initialValues={EMPTY_PHASE_VALUES}
+                submitLabel="Ajouter la phase"
+                pendingLabel="Ajout…"
+              />
+            </div>
+          </section>
+        ) : undefined
       }
       statusPanel={
         <WorksiteStatusPanel

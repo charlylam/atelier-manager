@@ -131,6 +131,60 @@ describe('WorksiteDetailView : actions', () => {
   });
 });
 
+describe('WorksiteDetailView : phases', () => {
+  it('affiche les actions de chaque phase et le pied de section, sous les totaux', () => {
+    render(
+      <WorksiteDetailView
+        worksite={WORKSITE}
+        phaseActions={(phase) => (
+          <button type="button">Supprimer {phase.name}</button>
+        )}
+        phasesFooter={<p>Ajouter une phase</p>}
+      />
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Supprimer Débit' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Supprimer Usinage' })
+    ).toBeInTheDocument();
+
+    const phases = screen.getByRole('region', { name: 'Phases' });
+    const footer = screen.getByText('Ajouter une phase');
+    const totals = screen.getByText('Total estimé');
+    expect(phases).toContainElement(footer);
+    expect(
+      totals.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
+  it('n’affiche ni colonne d’actions ni pied sans eux', () => {
+    render(<WorksiteDetailView worksite={WORKSITE} />);
+
+    expect(
+      screen.queryByRole('columnheader', { name: 'Actions' })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Ajouter une phase')).not.toBeInTheDocument();
+  });
+
+  it('affiche le pied même sans phase', () => {
+    render(
+      <WorksiteDetailView
+        worksite={{
+          ...WORKSITE,
+          phases: [],
+          totals: { estimatedHours: '0.00', actualHours: '0.00' },
+        }}
+        phasesFooter={<p>Ajouter une phase</p>}
+      />
+    );
+
+    expect(screen.getByText('Aucune phase.')).toBeInTheDocument();
+    expect(screen.getByText('Ajouter une phase')).toBeInTheDocument();
+  });
+});
+
 describe('WorksiteDetailView : emplacement du statut', () => {
   it('affiche le panneau de statut après la section des phases', () => {
     render(

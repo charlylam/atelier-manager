@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { formatDate } from '@/lib/format';
-import type { Worksite } from '@/lib/worksites';
+import type { Phase, Worksite } from '@/lib/worksites';
 import { PhasesTable } from './PhasesTable';
 import { WorksiteStatusBadge } from './WorksiteStatusBadge';
 
@@ -20,10 +20,18 @@ function siteLabel(worksite: Worksite) {
 type Props = {
   worksite: Worksite;
   actions?: ReactNode; // à côté du titre (modifier)
+  phaseActions?: (phase: Phase) => ReactNode; // dernière colonne du tableau des phases
+  phasesFooter?: ReactNode; // sous les totaux (ajouter une phase)
   statusPanel?: ReactNode; // après les phases (changer le statut)
 };
 
-export function WorksiteDetailView({ worksite, actions, statusPanel }: Props) {
+export function WorksiteDetailView({
+  worksite,
+  actions,
+  phaseActions,
+  phasesFooter,
+  statusPanel,
+}: Props) {
   return (
     <>
       <p className="text-sm">
@@ -76,7 +84,13 @@ export function WorksiteDetailView({ worksite, actions, statusPanel }: Props) {
         <h2 id="phases-heading" className="text-lg font-semibold">
           Phases
         </h2>
-        <PhasesTable phases={worksite.phases} totals={worksite.totals} />
+        <PhasesTable
+          phases={worksite.phases}
+          totals={worksite.totals}
+          phaseActions={phaseActions}
+        />
+
+        {phasesFooter && <div className="mt-8">{phasesFooter}</div>}
       </section>
 
       {statusPanel && <div className="mt-8">{statusPanel}</div>}

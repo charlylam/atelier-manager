@@ -66,3 +66,10 @@ const EDITABLE: WorksiteStatus[] = ['pending', 'in_production', 'ready'];
 export function canEditWorksite(status: WorksiteStatus): boolean {
   return EDITABLE.includes(status);
 }
+
+// Mêmes statuts que l'API (STRUCTURE_EDITABLE) : ajout et suppression de phases.
+const PHASES_EDITABLE: WorksiteStatus[] = ['pending', 'in_production'];
+
+export function canEditPhases(status: WorksiteStatus): boolean {
+  return PHASES_EDITABLE.includes(status);
+}
