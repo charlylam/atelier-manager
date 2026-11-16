@@ -59,3 +59,10 @@ export function worksiteStatusChangesFor(
     (target) => WORKSITE_STATUS_CHANGES[target]
   );
 }
+
+// Mêmes statuts que l'API (DETAILS_EDITABLE) : un chantier livré ou annulé n'est plus modifiable.
+const EDITABLE: WorksiteStatus[] = ['pending', 'in_production', 'ready'];
+
+export function canEditWorksite(status: WorksiteStatus): boolean {
+  return EDITABLE.includes(status);
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   WORKSITE_STATUS_CHANGES,
+  canEditWorksite,
   worksiteStatusChangesFor,
 } from '@/lib/worksite-status-ui';
 import {
@@ -30,6 +31,16 @@ describe('worksiteStatusChangesFor', () => {
       expect(change.question).not.toBe('');
       expect(change.confirmLabel).not.toBe('');
     }
+  });
+});
+
+describe('canEditWorksite', () => {
+  it('autorise la modification tant que le chantier n’est ni livré ni annulé', () => {
+    expect(canEditWorksite('pending')).toBe(true);
+    expect(canEditWorksite('in_production')).toBe(true);
+    expect(canEditWorksite('ready')).toBe(true);
+    expect(canEditWorksite('delivered')).toBe(false);
+    expect(canEditWorksite('canceled')).toBe(false);
   });
 });
 

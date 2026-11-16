@@ -11,7 +11,15 @@ const nav = vi.hoisted(() => ({
 }));
 vi.mock('next/navigation', () => nav);
 
-import { createWorksiteAction } from '@/app/(app)/chantiers/actions';
+import {
+  createWorksiteAction,
+  updateWorksiteAction,
+} from '@/app/(app)/chantiers/actions';
+import {
+  NOT_EDITABLE_MESSAGE,
+  WORKSITE_FIELD_MESSAGES,
+  worksiteInitialState,
+} from '@/lib/worksite-form';
 
 const fetchMock = vi.fn();
 
@@ -22,9 +30,32 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function apiError(status: number, code: string, message = 'x') {
-  return json({ error: { code, message } }, status);
+function apiError(
+  status: number,
+  code: string,
+  message = 'x',
+  details?: { path: string; message: string }[]
+) {
+  return json(
+    { error: { code, message, ...(details && { details }) } },
+    status
+  );
 }
+
+function form(fields: Record<string, string>) {
+  const data = new FormData();
+  for (const [key, value] of Object.entries(fields)) {
+    data.set(key, value);
+  }
+  return data;
+}
+
+const INITIAL = worksiteInitialState({
+  title: '',
+  description: '',
+  siteAddress: '',
+  dueDate: '',
+});
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -123,5 +154,127 @@ describe('createWorksiteAction', () => {
     await expect(createWorksiteAction(7)).rejects.toThrow(
       'cookies indisponibles'
     );
+  });
+});
+
+describe('updateWorksiteAction', () => {
+  it('modifie le chantier, efface les champs vidés, puis revient à sa fiche', async () => {
+    fetchMock.mockResolvedValue(json({ data: { id: 4 } }));
+
+    await expect(
+      updateWorksiteAction(
+        4,
+        INITIAL,
+        form({
+          title: ' Bibliothèque ',
+          description: '',
+          siteAddress: '',
+          dueDate: '2026-12-15',
+        })
+      )
+    ).rejects.toThrow('NEXT_REDIRECT /chantiers/4');
+
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toBe('http://api.test/api/worksites/4');
+    expect(options.method).toBe('PATCH');
+    expect(new Headers(options.headers).get('Authorization')).toBe(
+      'Bearer jeton-123'
+    );
+    expect(JSON.parse(options.body)).toEqual({
+      title: 'Bibliothèque',
+      description: null,
+      siteAddress: null,
+      dueDate: '2026-12-15',
+    });
+  });
+
+  it('accepte une échéance passée', async () => {
+    fetchMock.mockResolvedValue(json({ data: { id: 4 } }));
+
+    await expect(
+      updateWorksiteAction(
+        4,
+        INITIAL,
+        form({ title: 'A', dueDate: '2020-01-01' })
+      )
+    ).rejects.toThrow('NEXT_REDIRECT /chantiers/4');
+  });
+
+  it('refuse un titre vide sans appeler l’API', async () => {
+    const state = await updateWorksiteAction(4, INITIAL, form({ title: ' ' }));
+
+    expect(state.fieldErrors.title).toBe(WORKSITE_FIELD_MESSAGES.title);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('place les champs refusés par l’API et garde la saisie', async () => {
+    fetchMock.mockResolvedValue(
+      apiError(400, 'VALIDATION_ERROR', 'x', [
+        { path: 'dueDate', message: 'Invalid date' },
+        { path: 'inconnu', message: 'ignoré' },
+      ])
+    );
+
+    const state = await updateWorksiteAction(
+      4,
+      INITIAL,
+      form({ title: 'Bibliothèque' })
+    );
+
+    expect(state.fieldErrors).toEqual({
+      dueDate: WORKSITE_FIELD_MESSAGES.dueDate,
+    });
+    expect(state.message).toBe(
+      'Certaines informations sont invalides. Vérifiez les champs.'
+    );
+    expect(state.values.title).toBe('Bibliothèque');
+  });
+
+  it('explique qu’un chantier livré ou annulé ne se modifie plus (409)', async () => {
+    fetchMock.mockResolvedValue(apiError(409, 'CONFLICT'));
+
+    const state = await updateWorksiteAction(
+      4,
+      INITIAL,
+      form({ title: 'Bibliothèque' })
+    );
+
+    expect(state.message).toBe(NOT_EDITABLE_MESSAGE);
+    expect(state.values.title).toBe('Bibliothèque');
+  });
+
+  it('indique qu’un chantier inexistant n’existe plus (404)', async () => {
+    fetchMock.mockResolvedValue(apiError(404, 'NOT_FOUND'));
+
+    const state = await updateWorksiteAction(4, INITIAL, form({ title: 'A' }));
+
+    expect(state.message).toBe('Ce chantier n’existe plus.');
+  });
+
+  it('affiche un message générique pour une panne de l’API', async () => {
+    fetchMock.mockResolvedValue(apiError(500, 'INTERNAL_ERROR'));
+
+    const state = await updateWorksiteAction(4, INITIAL, form({ title: 'A' }));
+
+    expect(state.message).toBe('Une erreur est survenue. Réessayez.');
+    expect(nav.redirect).not.toHaveBeenCalled();
+  });
+
+  it('renvoie vers la connexion quand la session a expiré', async () => {
+    fetchMock.mockResolvedValue(apiError(401, 'UNAUTHORIZED'));
+
+    await expect(
+      updateWorksiteAction(4, INITIAL, form({ title: 'A' }))
+    ).rejects.toThrow('NEXT_REDIRECT /connexion?session=expiree');
+  });
+
+  it('relance une erreur qui ne vient pas de l’API', async () => {
+    cookieStore.get.mockImplementation(() => {
+      throw new Error('cookies indisponibles');
+    });
+
+    await expect(
+      updateWorksiteAction(4, INITIAL, form({ title: 'A' }))
+    ).rejects.toThrow('cookies indisponibles');
   });
 });

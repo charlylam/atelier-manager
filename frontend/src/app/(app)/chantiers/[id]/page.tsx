@@ -1,10 +1,12 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { WorksiteDetailView } from '@/components/worksites/WorksiteDetailView';
 import { WorksiteStatusPanel } from '@/components/worksites/WorksiteStatusPanel';
 import { ApiError } from '@/lib/errors';
 import { parseId } from '@/lib/params';
 import { orLogin } from '@/lib/session-guard';
+import { canEditWorksite } from '@/lib/worksite-status-ui';
 import { getWorksite } from '@/lib/worksites';
 import { changeWorksiteStatusAction } from '../status-actions';
 
@@ -43,6 +45,16 @@ async function WorksiteContent({ params }: { params: Params }) {
   return (
     <WorksiteDetailView
       worksite={worksite}
+      actions={
+        canEditWorksite(worksite.status) && (
+          <Link
+            href={`/chantiers/${worksite.id}/modifier`}
+            className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm"
+          >
+            Modifier
+          </Link>
+        )
+      }
       statusPanel={
         <WorksiteStatusPanel
           worksite={worksite}

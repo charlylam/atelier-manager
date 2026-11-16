@@ -19,10 +19,11 @@ function siteLabel(worksite: Worksite) {
 
 type Props = {
   worksite: Worksite;
+  actions?: ReactNode; // à côté du titre (modifier)
   statusPanel?: ReactNode; // après les phases (changer le statut)
 };
 
-export function WorksiteDetailView({ worksite, statusPanel }: Props) {
+export function WorksiteDetailView({ worksite, actions, statusPanel }: Props) {
   return (
     <>
       <p className="text-sm">
@@ -37,6 +38,9 @@ export function WorksiteDetailView({ worksite, statusPanel }: Props) {
           {worksite.title}
         </h1>
         <WorksiteStatusBadge status={worksite.status} />
+        {actions && (
+          <div className="ml-auto flex items-center gap-2">{actions}</div>
+        )}
       </div>
 
       <dl className="mt-6 grid max-w-xl grid-cols-[9rem_1fr] gap-y-2 text-sm">

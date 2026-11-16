@@ -110,6 +110,27 @@ describe('WorksiteDetailView', () => {
   });
 });
 
+describe('WorksiteDetailView : actions', () => {
+  it('affiche les actions à côté du titre', () => {
+    render(
+      <WorksiteDetailView
+        worksite={WORKSITE}
+        actions={<button type="button">Modifier</button>}
+      />
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Modifier' })
+    ).toBeInTheDocument();
+  });
+
+  it('n’affiche aucune action sans elles', () => {
+    render(<WorksiteDetailView worksite={WORKSITE} />);
+
+    expect(screen.queryByRole('button', { name: 'Modifier' })).toBeNull();
+  });
+});
+
 describe('WorksiteDetailView : emplacement du statut', () => {
   it('affiche le panneau de statut après la section des phases', () => {
     render(
