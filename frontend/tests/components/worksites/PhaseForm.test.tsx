@@ -86,6 +86,28 @@ describe('PhaseForm', () => {
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+
+  it('propose un lien d’annulation seulement s’il est demandé', () => {
+    const { unmount } = renderForm(vi.fn());
+    expect(screen.queryByRole('link', { name: 'Annuler' })).toBeNull();
+    unmount();
+
+    render(
+      <PhaseForm
+        action={vi.fn()}
+        initialValues={{ name: 'Usinage', estimatedHours: '12.50', notes: '' }}
+        submitLabel="Enregistrer"
+        pendingLabel="Enregistrement…"
+        cancelHref="/chantiers/4"
+      />
+    );
+    expect(screen.getByRole('link', { name: 'Annuler' })).toHaveAttribute(
+      'href',
+      '/chantiers/4'
+    );
+    expect(screen.getByLabelText('Nom')).toHaveValue('Usinage');
+    expect(screen.getByLabelText('Heures estimées')).toHaveValue(12.5);
+  });
 });
 
 describe('DeletePhaseForm', () => {

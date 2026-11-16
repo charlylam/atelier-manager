@@ -1,6 +1,7 @@
 import { normalizeDecimal } from './line-form';
 import { fieldErrorsFromDetails } from './form-errors';
 import type { ApiErrorDetail } from './errors';
+import type { Phase } from './worksites';
 
 export const PHASE_FIELDS = ['name', 'estimatedHours', 'notes'] as const;
 
@@ -67,6 +68,32 @@ export function toCreatePhasePayload(values: PhaseFormValues) {
 // Colonne de la base : 4 chiffres avant la virgule, 2 après.
 const HOURS = /^\d{1,4}(\.\d{1,2})?$/;
 
+export function isValidHours(value: string) {
+  return HOURS.test(value);
+}
+
+/**
+ * Modification de la structure (nom, estimation, notes) : les notes vidées partent à null pour
+ * être effacées. Une estimation vidée compte pour 0 heure, comme à la création. Le statut et le
+ * temps réel ne sont jamais envoyés ici : l'API les réserve à la fabrication.
+ */
+export function toUpdatePhasePayload(values: PhaseFormValues) {
+  return {
+    name: values.name,
+    estimatedHours: values.estimatedHours || '0',
+    notes: values.notes || null,
+  };
+}
+
+/** Valeurs d'une phase existante, pour préremplir le formulaire de modification. */
+export function phaseValuesFromPhase(phase: Phase): PhaseFormValues {
+  return {
+    name: phase.name,
+    estimatedHours: phase.estimatedHours,
+    notes: phase.notes ?? '',
+  };
+}
+
 /** Contrôle fait avant l'appel à l'API. */
 export function validatePhaseValues(values: PhaseFormValues) {
   const fieldErrors: PhaseFormState['fieldErrors'] = {};
@@ -74,7 +101,7 @@ export function validatePhaseValues(values: PhaseFormValues) {
   if (values.name === '' || values.name.length > 100) {
     fieldErrors.name = PHASE_FIELD_MESSAGES.name;
   }
-  if (values.estimatedHours !== '' && !HOURS.test(values.estimatedHours)) {
+  if (values.estimatedHours !== '' && !isValidHours(values.estimatedHours)) {
     fieldErrors.estimatedHours = PHASE_FIELD_MESSAGES.estimatedHours;
   }
   if (values.notes.length > 1000) {

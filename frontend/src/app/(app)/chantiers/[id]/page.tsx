@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { DeletePhaseForm } from '@/components/worksites/DeletePhaseForm';
+import { PhaseActions } from '@/components/worksites/PhaseActions';
 import { PhaseForm } from '@/components/worksites/PhaseForm';
 import { WorksiteDetailView } from '@/components/worksites/WorksiteDetailView';
 import { WorksiteStatusPanel } from '@/components/worksites/WorksiteStatusPanel';
@@ -11,10 +11,25 @@ import { EMPTY_PHASE_VALUES } from '@/lib/phase-form';
 import { orLogin } from '@/lib/session-guard';
 import { canEditPhases, canEditWorksite } from '@/lib/worksite-status-ui';
 import { getWorksite } from '@/lib/worksites';
-import { addPhaseAction, deletePhaseAction } from '../phase-actions';
+import type { Phase } from '@/lib/worksites';
+import {
+  addPhaseAction,
+  changePhaseHoursAction,
+  changePhaseStatusAction,
+  deletePhaseAction,
+  movePhaseAction,
+} from '../phase-actions';
 import { changeWorksiteStatusAction } from '../status-actions';
 
 type Params = Promise<{ id: string }>;
+
+// Identifiants des phases dans l'ordre demandé : la phase à `index` échange sa place avec sa voisine.
+function reordered(phases: Phase[], index: number, direction: 'up' | 'down') {
+  const ids = phases.map((phase) => phase.id);
+  const other = direction === 'up' ? index - 1 : index + 1;
+  [ids[index], ids[other]] = [ids[other], ids[index]];
+  return ids;
+}
 
 export default function WorksitePage({ params }: { params: Params }) {
   return (
@@ -46,7 +61,8 @@ async function WorksiteContent({ params }: { params: Params }) {
     throw error;
   }
 
-  // L'API refuse (409) l'ajout et la suppression de phases hors des statuts en attente et en fabrication.
+  // L'API refuse (409) toute modification de la structure des phases hors des statuts en attente
+  // et en fabrication, et de leur avancement hors de la fabrication.
   const phasesEditable = canEditPhases(worksite.status);
 
   return (
@@ -64,12 +80,46 @@ async function WorksiteContent({ params }: { params: Params }) {
       }
       phaseActions={
         phasesEditable
-          ? (phase) => (
-              <DeletePhaseForm
-                action={deletePhaseAction.bind(null, worksite.id, phase.id)}
-                name={phase.name}
-              />
-            )
+          ? (phase) => {
+              const index = worksite.phases.findIndex(
+                (item) => item.id === phase.id
+              );
+              return (
+                <PhaseActions
+                  worksiteId={worksite.id}
+                  phase={phase}
+                  isFirst={index === 0}
+                  isLast={index === worksite.phases.length - 1}
+                  structure
+                  progress={worksite.status === 'in_production'}
+                  statusAction={(target) =>
+                    changePhaseStatusAction.bind(
+                      null,
+                      worksite.id,
+                      phase.id,
+                      target
+                    )
+                  }
+                  hoursAction={changePhaseHoursAction.bind(
+                    null,
+                    worksite.id,
+                    phase.id
+                  )}
+                  moveAction={(direction) =>
+                    movePhaseAction.bind(
+                      null,
+                      worksite.id,
+                      reordered(worksite.phases, index, direction)
+                    )
+                  }
+                  deleteAction={deletePhaseAction.bind(
+                    null,
+                    worksite.id,
+                    phase.id
+                  )}
+                />
+              );
+            }
           : undefined
       }
       phasesFooter={

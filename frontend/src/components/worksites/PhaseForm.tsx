@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import Link from 'next/link';
 import { Field, FIELD_CLASS, invalidProps } from '@/components/form/Field';
 import { phaseInitialState } from '@/lib/phase-form';
 import type { PhaseFormState, PhaseFormValues } from '@/lib/phase-form';
@@ -13,6 +14,7 @@ type Props = {
   initialValues: PhaseFormValues;
   submitLabel: string;
   pendingLabel: string;
+  cancelHref?: string;
 };
 
 export function PhaseForm({
@@ -20,6 +22,7 @@ export function PhaseForm({
   initialValues,
   submitLabel,
   pendingLabel,
+  cancelHref,
 }: Props) {
   const [state, formAction, pending] = useActionState(
     action,
@@ -88,13 +91,20 @@ export function PhaseForm({
         />
       </Field>
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md bg-emerald-800 px-4 py-2 font-medium text-white disabled:opacity-60"
-      >
-        {pending ? pendingLabel : submitLabel}
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-md bg-emerald-800 px-4 py-2 font-medium text-white disabled:opacity-60"
+        >
+          {pending ? pendingLabel : submitLabel}
+        </button>
+        {cancelHref && (
+          <Link href={cancelHref} className="text-sm underline">
+            Annuler
+          </Link>
+        )}
+      </div>
     </form>
   );
 }
