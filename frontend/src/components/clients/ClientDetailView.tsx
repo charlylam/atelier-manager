@@ -145,7 +145,14 @@ export function ClientDetailView({ client, actions, footer }: Props) {
                   key={worksite.id}
                   className="border-b border-neutral-200 dark:border-neutral-800"
                 >
-                  <td className="py-2 pr-3 font-mono">{worksite.reference}</td>
+                  <td className="py-2 pr-3 font-mono">
+                    <Link
+                      href={`/chantiers/${worksite.id}`}
+                      className="font-medium underline"
+                    >
+                      {worksite.reference}
+                    </Link>
+                  </td>
                   <td className="py-2 pr-3">{worksite.title}</td>
                   <td className="py-2 pr-3">
                     {WORKSITE_STATUS_LABELS[worksite.status]}

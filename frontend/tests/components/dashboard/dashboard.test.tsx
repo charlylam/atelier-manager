@@ -42,6 +42,25 @@ describe('WorksiteStatusCards', () => {
     expect(within(items[1]).getByText('2')).toBeInTheDocument();
     expect(within(items[3]).getByText('Livrés')).toBeInTheDocument();
   });
+
+  it('lie chaque compteur à la liste des chantiers de ce statut', () => {
+    render(
+      <WorksiteStatusCards
+        counts={{
+          pending: 0,
+          in_production: 2,
+          ready: 0,
+          delivered: 5,
+          canceled: 1,
+        }}
+      />
+    );
+
+    expect(screen.getAllByRole('link')).toHaveLength(5);
+    expect(
+      screen.getByRole('link', { name: /Prêts à livrer/ })
+    ).toHaveAttribute('href', '/chantiers?status=ready');
+  });
 });
 
 describe('LateWorksites', () => {
@@ -57,6 +76,9 @@ describe('LateWorksites', () => {
 
     const row = screen.getAllByRole('row')[1];
     expect(row).toHaveTextContent('CH-2026-0001');
+    expect(
+      within(row).getByRole('link', { name: 'CH-2026-0001' })
+    ).toHaveAttribute('href', '/chantiers/1');
     expect(row).toHaveTextContent('Famille Durand');
     expect(row).toHaveTextContent('15/12/2026');
     expect(row).toHaveTextContent('3 jours');

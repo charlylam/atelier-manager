@@ -7,6 +7,7 @@ const LINKS = [
   { href: '/tableau-de-bord', label: 'Tableau de bord' },
   { href: '/clients', label: 'Clients' },
   { href: '/devis', label: 'Devis' },
+  { href: '/chantiers', label: 'Chantiers' },
 ];
 
 export function NavLinks() {

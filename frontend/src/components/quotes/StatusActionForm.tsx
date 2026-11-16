@@ -3,9 +3,12 @@
 import { useActionState } from 'react';
 import type { StatusActionState, StatusChange } from '@/lib/quote-status-ui';
 
+// Sert aussi aux chantiers : seuls les trois textes sont utilisés.
+type Change = Pick<StatusChange, 'label' | 'question' | 'confirmLabel'>;
+
 type Props = {
   action: (state: StatusActionState) => Promise<StatusActionState>;
-  change: StatusChange;
+  change: Change;
 };
 
 // <details>, comme pour la suppression d'un client : le premier clic affiche la question sans

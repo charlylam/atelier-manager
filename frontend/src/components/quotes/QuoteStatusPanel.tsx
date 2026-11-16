@@ -5,6 +5,7 @@ import {
   statusChangesFor,
 } from '@/lib/quote-status-ui';
 import type { StatusActionState, StatusTarget } from '@/lib/quote-status-ui';
+import { CreateWorksiteForm } from '@/components/worksites/CreateWorksiteForm';
 import { DuplicateForm } from './DuplicateForm';
 import { StatusActionForm } from './StatusActionForm';
 
@@ -14,6 +15,7 @@ type Props = {
   quote: Pick<Quote, 'status' | 'lines'>;
   statusAction: (target: StatusTarget) => Action; // action liée au devis et au statut visé
   duplicateAction: Action;
+  worksiteAction: Action; // création du chantier, ou ouverture s'il existe déjà
 };
 
 // Composant serveur : la page lui fournit les actions déjà liées au devis.
@@ -21,6 +23,7 @@ export function QuoteStatusPanel({
   quote,
   statusAction,
   duplicateAction,
+  worksiteAction,
 }: Props) {
   // L'API refuse (409) d'envoyer un devis sans ligne : on l'explique au lieu de proposer l'envoi.
   const blockedByNoLines = quote.status === 'draft' && quote.lines.length === 0;
@@ -47,6 +50,10 @@ export function QuoteStatusPanel({
             change={change}
           />
         ))}
+
+        {quote.status === 'accepted' && (
+          <CreateWorksiteForm action={worksiteAction} />
+        )}
 
         {duplicable && <DuplicateForm action={duplicateAction} />}
       </div>

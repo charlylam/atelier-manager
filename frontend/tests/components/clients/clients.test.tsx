@@ -163,6 +163,10 @@ describe('ClientDetailView', () => {
     );
     expect(worksiteRows[0]).toHaveTextContent('En fabrication');
     expect(worksiteRows[0]).toHaveTextContent('15/12/2026');
+    expect(screen.getByRole('link', { name: 'CH-2026-0001' })).toHaveAttribute(
+      'href',
+      '/chantiers/20'
+    );
   });
 
   it('indique l’absence de devis et de chantiers, et les coordonnées vides', () => {
