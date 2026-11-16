@@ -110,6 +110,33 @@ describe('WorksiteDetailView', () => {
   });
 });
 
+describe('WorksiteDetailView : emplacement du statut', () => {
+  it('affiche le panneau de statut après la section des phases', () => {
+    render(
+      <WorksiteDetailView
+        worksite={WORKSITE}
+        statusPanel={<p>Panneau de statut</p>}
+      />
+    );
+
+    const panel = screen.getByText('Panneau de statut');
+    const phases = screen.getByRole('region', { name: 'Phases' });
+
+    expect(phases).not.toContainElement(panel);
+    expect(
+      phases.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
+  it('n’affiche rien de plus sans panneau de statut', () => {
+    const { container } = render(<WorksiteDetailView worksite={WORKSITE} />);
+
+    expect(container.lastElementChild).toBe(
+      screen.getByRole('region', { name: 'Phases' })
+    );
+  });
+});
+
 describe('PhasesTable', () => {
   it('liste les phases dans l’ordre, avec statut, heures et notes', () => {
     render(<PhasesTable phases={WORKSITE.phases} totals={WORKSITE.totals} />);

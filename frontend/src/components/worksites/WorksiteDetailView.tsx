@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { formatDate } from '@/lib/format';
 import type { Worksite } from '@/lib/worksites';
@@ -16,7 +17,12 @@ function siteLabel(worksite: Worksite) {
     : EMPTY;
 }
 
-export function WorksiteDetailView({ worksite }: { worksite: Worksite }) {
+type Props = {
+  worksite: Worksite;
+  statusPanel?: ReactNode; // après les phases (changer le statut)
+};
+
+export function WorksiteDetailView({ worksite, statusPanel }: Props) {
   return (
     <>
       <p className="text-sm">
@@ -68,6 +74,8 @@ export function WorksiteDetailView({ worksite }: { worksite: Worksite }) {
         </h2>
         <PhasesTable phases={worksite.phases} totals={worksite.totals} />
       </section>
+
+      {statusPanel && <div className="mt-8">{statusPanel}</div>}
     </>
   );
 }

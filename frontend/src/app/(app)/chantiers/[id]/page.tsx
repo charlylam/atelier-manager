@@ -1,10 +1,12 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { WorksiteDetailView } from '@/components/worksites/WorksiteDetailView';
+import { WorksiteStatusPanel } from '@/components/worksites/WorksiteStatusPanel';
 import { ApiError } from '@/lib/errors';
 import { parseId } from '@/lib/params';
 import { orLogin } from '@/lib/session-guard';
 import { getWorksite } from '@/lib/worksites';
+import { changeWorksiteStatusAction } from '../status-actions';
 
 type Params = Promise<{ id: string }>;
 
@@ -38,5 +40,17 @@ async function WorksiteContent({ params }: { params: Params }) {
     throw error;
   }
 
-  return <WorksiteDetailView worksite={worksite} />;
+  return (
+    <WorksiteDetailView
+      worksite={worksite}
+      statusPanel={
+        <WorksiteStatusPanel
+          worksite={worksite}
+          statusAction={(target) =>
+            changeWorksiteStatusAction.bind(null, worksite.id, target)
+          }
+        />
+      }
+    />
+  );
 }
