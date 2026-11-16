@@ -17,6 +17,7 @@ type Props = {
   actions?: ReactNode; // à côté du titre (modifier, télécharger le PDF)
   lineActions?: (line: QuoteLine) => ReactNode; // dernière colonne du tableau des lignes
   linesFooter?: ReactNode; // sous les totaux (ajouter une ligne)
+  statusPanel?: ReactNode; // après les lignes (changer le statut, dupliquer)
 };
 
 export function QuoteDetailView({
@@ -24,6 +25,7 @@ export function QuoteDetailView({
   actions,
   lineActions,
   linesFooter,
+  statusPanel,
 }: Props) {
   return (
     <>
@@ -145,6 +147,8 @@ export function QuoteDetailView({
 
         {linesFooter && <div className="mt-8">{linesFooter}</div>}
       </section>
+
+      {statusPanel && <div className="mt-8">{statusPanel}</div>}
     </>
   );
 }
