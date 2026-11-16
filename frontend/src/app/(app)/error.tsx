@@ -1,10 +1,10 @@
 'use client';
 
 export default function AppError({
-  reset,
+  retry,
 }: {
   error: Error;
-  reset: () => void;
+  retry: () => void;
 }) {
   return (
     <main className="mx-auto max-w-md p-8 text-center">
@@ -14,7 +14,7 @@ export default function AppError({
       </p>
       <button
         type="button"
-        onClick={reset}
+        onClick={() => retry()}
         className="mt-4 rounded-md bg-emerald-800 px-4 py-2 text-white"
       >
         Réessayer
