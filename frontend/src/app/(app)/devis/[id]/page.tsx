@@ -10,6 +10,7 @@ import { DEFAULT_LINE_VALUES } from '@/lib/line-form';
 import { parseId } from '@/lib/params';
 import { getQuote } from '@/lib/quotes';
 import { orLogin } from '@/lib/session-guard';
+import { createWorksiteAction } from '../../chantiers/actions';
 import { addLineAction, deleteLineAction } from '../actions';
 import {
   changeQuoteStatusAction,
@@ -113,6 +114,7 @@ async function QuoteContent({ params }: { params: Params }) {
             changeQuoteStatusAction.bind(null, quote.id, target)
           }
           duplicateAction={duplicateQuoteAction.bind(null, quote.id)}
+          worksiteAction={createWorksiteAction.bind(null, quote.id)}
         />
       }
     />

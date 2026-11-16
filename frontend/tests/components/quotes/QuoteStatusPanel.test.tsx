@@ -25,12 +25,14 @@ function renderPanel(status: QuoteStatus, lines: QuoteLine[] = [LINE]) {
       quote={{ status, lines }}
       statusAction={statusAction}
       duplicateAction={vi.fn(async () => ({}))}
+      worksiteAction={vi.fn(async () => ({}))}
     />
   );
   return { statusAction };
 }
 
 const DUPLICATE = { name: 'Dupliquer ce devis' };
+const WORKSITE = { name: 'Créer ou ouvrir le chantier' };
 
 describe('QuoteStatusPanel', () => {
   it('propose l’envoi d’un brouillon qui a des lignes', () => {
@@ -69,6 +71,22 @@ describe('QuoteStatusPanel', () => {
       expect(screen.getByRole('button', DUPLICATE)).toBeInTheDocument();
       expect(screen.queryByText(/^Marquer comme/)).not.toBeInTheDocument();
       expect(statusAction).not.toHaveBeenCalled();
+    }
+  );
+
+  it('propose le chantier seulement pour un devis accepté', () => {
+    renderPanel('accepted');
+
+    expect(screen.getByRole('button', WORKSITE)).toBeInTheDocument();
+    expect(screen.getByRole('button', DUPLICATE)).toBeInTheDocument();
+  });
+
+  it.each(['draft', 'sent', 'rejected', 'expired'] as const)(
+    'ne propose pas de chantier pour un devis %s',
+    (status) => {
+      renderPanel(status);
+
+      expect(screen.queryByRole('button', WORKSITE)).not.toBeInTheDocument();
     }
   );
 });
