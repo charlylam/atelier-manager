@@ -16,7 +16,10 @@ export const QUOTE_STATUSES = [
   'expired',
 ] as const;
 
+export const PHASE_STATUSES = ['todo', 'in_progress', 'done'] as const;
+
 export type WorksiteStatus = (typeof WORKSITE_STATUSES)[number];
+export type PhaseStatus = (typeof PHASE_STATUSES)[number];
 export type QuoteStatus = (typeof QUOTE_STATUSES)[number];
 
 // Au pluriel : intitulés des compteurs.
@@ -35,6 +38,13 @@ export const WORKSITE_STATUS_LABELS: Record<WorksiteStatus, string> = {
   ready: 'Prêt à livrer',
   delivered: 'Livré',
   canceled: 'Annulé',
+};
+
+// Statut d'une phase de chantier.
+export const PHASE_STATUS_LABELS: Record<PhaseStatus, string> = {
+  todo: 'À faire',
+  in_progress: 'En cours',
+  done: 'Terminée',
 };
 
 export const QUOTE_STATUS_COUNT_LABELS: Record<QuoteStatus, string> = {

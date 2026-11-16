@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { WORKSITE_STATUS_LABELS } from '@/lib/labels';
 import { formatDate } from '@/lib/format';
 import type { Dashboard } from '@/lib/dashboard';
@@ -59,7 +60,14 @@ export function LateWorksites({
                   key={item.id}
                   className="border-b border-neutral-200 dark:border-neutral-800"
                 >
-                  <td className="py-2 pr-3 font-mono">{item.reference}</td>
+                  <td className="py-2 pr-3 font-mono">
+                    <Link
+                      href={`/chantiers/${item.id}`}
+                      className="font-medium underline"
+                    >
+                      {item.reference}
+                    </Link>
+                  </td>
                   <td className="py-2 pr-3">{item.title}</td>
                   <td className="py-2 pr-3">
                     {item.client.name}

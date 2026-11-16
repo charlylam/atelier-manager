@@ -49,4 +49,21 @@ describe('NavLinks', () => {
       'aria-current'
     );
   });
+
+  it('propose « Chantiers » et le garde actif sur la fiche d’un chantier', () => {
+    navigation.usePathname.mockReturnValue('/chantiers/4');
+    render(<NavLinks />);
+
+    expect(screen.getByRole('link', { name: 'Chantiers' })).toHaveAttribute(
+      'href',
+      '/chantiers'
+    );
+    expect(screen.getByRole('link', { name: 'Chantiers' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByRole('link', { name: 'Devis' })).not.toHaveAttribute(
+      'aria-current'
+    );
+  });
 });

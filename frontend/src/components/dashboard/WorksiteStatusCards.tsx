@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { WORKSITE_STATUSES, WORKSITE_STATUS_COUNT_LABELS } from '@/lib/labels';
 import type { Dashboard } from '@/lib/dashboard';
 
@@ -17,10 +18,12 @@ export function WorksiteStatusCards({
             key={status}
             className="rounded-md border border-neutral-200 dark:border-neutral-800 p-3"
           >
-            <p className="text-2xl font-semibold">{counts[status]}</p>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              {WORKSITE_STATUS_COUNT_LABELS[status]}
-            </p>
+            <Link href={`/chantiers?status=${status}`} className="block">
+              <p className="text-2xl font-semibold">{counts[status]}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 underline">
+                {WORKSITE_STATUS_COUNT_LABELS[status]}
+              </p>
+            </Link>
           </li>
         ))}
       </ul>
