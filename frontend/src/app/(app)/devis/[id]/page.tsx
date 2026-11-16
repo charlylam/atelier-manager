@@ -4,12 +4,17 @@ import { notFound } from 'next/navigation';
 import { DeleteLineForm } from '@/components/quotes/DeleteLineForm';
 import { LineForm } from '@/components/quotes/LineForm';
 import { QuoteDetailView } from '@/components/quotes/QuoteDetailView';
+import { QuoteStatusPanel } from '@/components/quotes/QuoteStatusPanel';
 import { ApiError } from '@/lib/errors';
 import { DEFAULT_LINE_VALUES } from '@/lib/line-form';
 import { parseId } from '@/lib/params';
 import { getQuote } from '@/lib/quotes';
 import { orLogin } from '@/lib/session-guard';
 import { addLineAction, deleteLineAction } from '../actions';
+import {
+  changeQuoteStatusAction,
+  duplicateQuoteAction,
+} from '../status-actions';
 
 type Params = Promise<{ id: string }>;
 
@@ -100,6 +105,15 @@ async function QuoteContent({ params }: { params: Params }) {
             </div>
           </section>
         ) : undefined
+      }
+      statusPanel={
+        <QuoteStatusPanel
+          quote={quote}
+          statusAction={(target) =>
+            changeQuoteStatusAction.bind(null, quote.id, target)
+          }
+          duplicateAction={duplicateQuoteAction.bind(null, quote.id)}
+        />
       }
     />
   );
