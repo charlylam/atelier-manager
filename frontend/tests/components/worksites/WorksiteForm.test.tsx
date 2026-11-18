@@ -91,4 +91,96 @@ describe('WorksiteForm', () => {
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+
+  describe('quand les valeurs initiales changent', () => {
+    const NEW_VALUES = {
+      title: 'Armoire',
+      description: 'Noyer',
+      siteAddress: '8 rue Neuve',
+      dueDate: '2026-12-26',
+    };
+
+    function formWith(
+      values: typeof VALUES,
+      action: Action = vi.fn<Action>(async (state) => state)
+    ) {
+      return (
+        <WorksiteForm
+          action={action}
+          initialValues={values}
+          cancelHref="/chantiers/4"
+        />
+      );
+    }
+
+    it('affiche les nouvelles valeurs (valeurs A, puis valeurs B)', () => {
+      const { rerender } = render(formWith(VALUES));
+      expect(screen.getByLabelText('Échéance')).toHaveValue('2026-12-15');
+
+      rerender(formWith(NEW_VALUES));
+
+      expect(screen.getByLabelText('Titre')).toHaveValue('Armoire');
+      expect(screen.getByLabelText('Description')).toHaveValue('Noyer');
+      expect(screen.getByLabelText('Adresse du chantier')).toHaveValue(
+        '8 rue Neuve'
+      );
+      expect(screen.getByLabelText('Échéance')).toHaveValue('2026-12-26');
+    });
+
+    it('remplace les valeurs affichées par un état issu d’un envoi précédent', async () => {
+      // Le formulaire a renvoyé un état (refus) avec ses propres valeurs, puis les données changent.
+      const refuse = vi.fn<Action>(async () => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: {},
+        values: { ...VALUES, dueDate: '2026-11-01' },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES, refuse));
+      await user.click(screen.getByRole('button', { name: 'Enregistrer' }));
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+      expect(screen.getByLabelText('Échéance')).toHaveValue('2026-11-01');
+
+      rerender(formWith(NEW_VALUES, refuse));
+
+      expect(screen.getByLabelText('Échéance')).toHaveValue('2026-12-26');
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('conserve la saisie tant que les valeurs initiales sont identiques', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES));
+
+      await user.clear(screen.getByLabelText('Titre'));
+      await user.type(screen.getByLabelText('Titre'), 'Brouillon en cours');
+      // Nouvel objet, même contenu : ce que renvoie la page à chaque rendu.
+      rerender(formWith({ ...VALUES }));
+
+      expect(screen.getByLabelText('Titre')).toHaveValue('Brouillon en cours');
+    });
+
+    it('conserve la saisie et l’erreur après un refus du serveur', async () => {
+      const refuse = vi.fn<Action>(async (_state, formData) => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: { dueDate: 'La date d’échéance est invalide.' },
+        values: {
+          title: String(formData.get('title')),
+          description: VALUES.description,
+          siteAddress: VALUES.siteAddress,
+          dueDate: VALUES.dueDate,
+        },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES, refuse));
+
+      await user.clear(screen.getByLabelText('Titre'));
+      await user.type(screen.getByLabelText('Titre'), 'Brouillon refusé');
+      await user.click(screen.getByRole('button', { name: 'Enregistrer' }));
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+
+      rerender(formWith({ ...VALUES }, refuse));
+
+      expect(screen.getByLabelText('Titre')).toHaveValue('Brouillon refusé');
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+  });
 });
