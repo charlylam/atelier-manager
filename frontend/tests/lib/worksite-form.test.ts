@@ -5,6 +5,7 @@ import {
   validateWorksiteValues,
   worksiteFieldErrorsFromApi,
   worksiteValuesFromFormData,
+  worksiteValuesKey,
   worksiteValuesFromWorksite,
 } from '@/lib/worksite-form';
 import type { Worksite } from '@/lib/worksites';
@@ -112,5 +113,35 @@ describe('worksiteFieldErrorsFromApi', () => {
       ])
     ).toEqual({ siteAddress: WORKSITE_FIELD_MESSAGES.siteAddress });
     expect(worksiteFieldErrorsFromApi()).toEqual({});
+  });
+});
+
+describe('worksiteValuesKey', () => {
+  it('est identique pour des valeurs identiques, quel que soit l’ordre des propriétés', () => {
+    const a = { ...VALID, dueDate: '2026-12-15' };
+    const reordered = {
+      dueDate: '2026-12-15',
+      siteAddress: '',
+      description: '',
+      title: 'Bibliothèque',
+    };
+
+    expect(worksiteValuesKey(a)).toBe(worksiteValuesKey({ ...a }));
+    expect(worksiteValuesKey(a)).toBe(worksiteValuesKey(reordered));
+  });
+
+  it.each(['title', 'description', 'siteAddress', 'dueDate'] as const)(
+    'change quand %s change',
+    (field) => {
+      expect(worksiteValuesKey({ ...VALID, [field]: 'autre' })).not.toBe(
+        worksiteValuesKey(VALID)
+      );
+    }
+  );
+
+  it('ne confond pas deux répartitions différentes du même texte entre les champs', () => {
+    expect(
+      worksiteValuesKey({ ...VALID, title: 'a', description: 'b' })
+    ).not.toBe(worksiteValuesKey({ ...VALID, title: 'ab', description: '' }));
   });
 });

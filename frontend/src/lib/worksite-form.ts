@@ -32,6 +32,17 @@ export const NOT_EDITABLE_MESSAGE =
 
 export const WORKSITE_GONE_MESSAGE = 'Ce chantier n’existe plus.';
 
+/**
+ * Clé qui change quand les valeurs initiales du formulaire changent. L'état d'un formulaire
+ * (useActionState) n'est lu depuis les props qu'au premier rendu de l'instance, et Next.js garde
+ * une page quittée montée (Activity) : sans cette clé, un formulaire rouvert après un
+ * enregistrement garde les anciennes valeurs. Les champs sont lus dans l'ordre de WORKSITE_FIELDS,
+ * indépendant de l'ordre des propriétés de l'objet.
+ */
+export function worksiteValuesKey(values: WorksiteFormValues) {
+  return JSON.stringify(WORKSITE_FIELDS.map((field) => values[field]));
+}
+
 export function worksiteInitialState(
   values: WorksiteFormValues
 ): WorksiteFormState {

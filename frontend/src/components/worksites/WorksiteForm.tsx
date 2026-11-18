@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import Link from 'next/link';
 import { Field, FIELD_CLASS, invalidProps } from '@/components/form/Field';
-import { worksiteInitialState } from '@/lib/worksite-form';
+import { worksiteInitialState, worksiteValuesKey } from '@/lib/worksite-form';
 import type {
   WorksiteFormState,
   WorksiteFormValues,
@@ -18,7 +18,15 @@ type Props = {
   cancelHref: string;
 };
 
-export function WorksiteForm({ action, initialValues, cancelHref }: Props) {
+// Enveloppe : la clé recrée le formulaire, donc son état, quand les valeurs initiales changent.
+// Tant qu'elles sont identiques (par exemple après un refus du serveur), la saisie est conservée.
+export function WorksiteForm(props: Props) {
+  return (
+    <WorksiteFormBody key={worksiteValuesKey(props.initialValues)} {...props} />
+  );
+}
+
+function WorksiteFormBody({ action, initialValues, cancelHref }: Props) {
   const [state, formAction, pending] = useActionState(
     action,
     worksiteInitialState(initialValues)
