@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LineForm } from '@/components/quotes/LineForm';
 import { DEFAULT_LINE_VALUES, LINE_FIELD_MESSAGES } from '@/lib/line-form';
-import type { LineFormState } from '@/lib/line-form';
+import type { LineFormState, LineFormValues } from '@/lib/line-form';
 
 type Action = (
   state: LineFormState,
@@ -161,5 +161,128 @@ describe('LineForm', () => {
     ).toHaveAccessibleDescription(LINE_FIELD_MESSAGES.unitPrice);
     expect(screen.getByLabelText('Désignation')).toHaveValue('Chêne');
     expect(screen.getByLabelText('Unité')).toHaveValue('m²');
+  });
+
+  describe('quand les valeurs initiales changent', () => {
+    const VALUES_A: LineFormValues = {
+      type: 'material',
+      label: 'Chêne massif',
+      quantity: '6',
+      unit: 'm²',
+      unitPrice: '180',
+      vatRate: '20',
+    };
+    const VALUES_B: LineFormValues = {
+      type: 'labor',
+      label: 'Pose',
+      quantity: '8',
+      unit: 'h',
+      unitPrice: '45',
+      vatRate: '10',
+    };
+
+    function formWith(
+      values: LineFormValues,
+      action: Action = vi.fn<Action>(async (state) => state)
+    ) {
+      return (
+        <LineForm
+          action={action}
+          initialValues={values}
+          submitLabel="Enregistrer la ligne"
+          pendingLabel="Enregistrement…"
+          cancelHref="/devis/5"
+        />
+      );
+    }
+
+    it('affiche les nouvelles valeurs (valeurs A, puis valeurs B)', () => {
+      const { rerender } = render(formWith(VALUES_A));
+      expect(screen.getByLabelText('Type')).toHaveValue('material');
+
+      rerender(formWith(VALUES_B));
+
+      expect(screen.getByLabelText('Type')).toHaveValue('labor');
+      expect(screen.getByLabelText('Désignation')).toHaveValue('Pose');
+      expect(screen.getByLabelText('Quantité')).toHaveValue(8);
+      expect(screen.getByLabelText('Unité')).toHaveValue('h');
+      expect(screen.getByLabelText('Prix unitaire HT (€)')).toHaveValue(45);
+      expect(screen.getByLabelText('TVA (%)')).toHaveValue(10);
+    });
+
+    it('remplace les valeurs affichées par un état issu d’un envoi précédent', async () => {
+      // Le formulaire a renvoyé un état (refus) avec ses propres valeurs, puis les données changent.
+      const refuse = vi.fn<Action>(async () => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: {},
+        values: { ...VALUES_A, type: 'service', label: 'Saisie refusée' },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A, refuse));
+      await user.click(
+        screen.getByRole('button', { name: 'Enregistrer la ligne' })
+      );
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+      expect(screen.getByLabelText('Désignation')).toHaveValue(
+        'Saisie refusée'
+      );
+      expect(screen.getByLabelText('Type')).toHaveValue('service');
+
+      rerender(formWith(VALUES_B, refuse));
+
+      expect(screen.getByLabelText('Désignation')).toHaveValue('Pose');
+      expect(screen.getByLabelText('Type')).toHaveValue('labor');
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('conserve la saisie tant que les valeurs initiales sont identiques', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A));
+
+      await user.clear(screen.getByLabelText('Désignation'));
+      await user.type(
+        screen.getByLabelText('Désignation'),
+        'Brouillon en cours'
+      );
+      await user.selectOptions(screen.getByLabelText('Type'), 'service');
+      // Nouvel objet, même contenu : ce que renvoie la page à chaque rendu.
+      rerender(formWith({ ...VALUES_A }));
+
+      expect(screen.getByLabelText('Désignation')).toHaveValue(
+        'Brouillon en cours'
+      );
+      expect(screen.getByLabelText('Type')).toHaveValue('service');
+    });
+
+    it('conserve la saisie et l’erreur après un refus du serveur', async () => {
+      const refuse = vi.fn<Action>(async (_state, formData) => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: { unitPrice: LINE_FIELD_MESSAGES.unitPrice },
+        values: {
+          ...VALUES_A,
+          type: String(formData.get('type')),
+          label: String(formData.get('label')),
+        },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A, refuse));
+
+      await user.clear(screen.getByLabelText('Désignation'));
+      await user.type(screen.getByLabelText('Désignation'), 'Ligne refusée');
+      await user.selectOptions(screen.getByLabelText('Type'), 'service');
+      await user.click(
+        screen.getByRole('button', { name: 'Enregistrer la ligne' })
+      );
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+
+      rerender(formWith({ ...VALUES_A }, refuse));
+
+      expect(screen.getByLabelText('Désignation')).toHaveValue('Ligne refusée');
+      expect(screen.getByLabelText('Type')).toHaveValue('service');
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('Prix unitaire HT (€)')
+      ).toHaveAccessibleDescription(LINE_FIELD_MESSAGES.unitPrice);
+    });
   });
 });

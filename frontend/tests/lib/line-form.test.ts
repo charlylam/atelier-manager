@@ -5,6 +5,7 @@ import {
   lineFieldErrorsFromApi,
   lineValuesFromFormData,
   lineValuesFromLine,
+  lineValuesKey,
   normalizeDecimal,
   toLinePayload,
   validateLineValues,
@@ -171,5 +172,46 @@ describe('lineFieldErrorsFromApi', () => {
     ).toEqual({
       unitPrice: LINE_FIELD_MESSAGES.unitPrice,
     });
+  });
+});
+
+describe('lineValuesKey', () => {
+  it('est identique pour des valeurs identiques, quel que soit l’ordre des propriétés', () => {
+    const reordered = {
+      vatRate: '20',
+      unitPrice: '180',
+      unit: 'm²',
+      quantity: '6',
+      label: 'Chêne massif',
+      type: 'material',
+    };
+
+    expect(lineValuesKey(VALID)).toBe(lineValuesKey({ ...VALID }));
+    expect(lineValuesKey(VALID)).toBe(lineValuesKey(reordered));
+  });
+
+  it('est identique à chaque appel avec les valeurs par défaut de l’ajout', () => {
+    expect(lineValuesKey(DEFAULT_LINE_VALUES)).toBe(
+      lineValuesKey({ ...DEFAULT_LINE_VALUES })
+    );
+  });
+
+  it.each([
+    ['type', 'labor'],
+    ['label', 'Autre désignation'],
+    ['quantity', '7'],
+    ['unit', 'h'],
+    ['unitPrice', '181'],
+    ['vatRate', '10'],
+  ] as const)('change quand %s change', (field, value) => {
+    expect(lineValuesKey({ ...VALID, [field]: value })).not.toBe(
+      lineValuesKey(VALID)
+    );
+  });
+
+  it('ne confond pas deux répartitions différentes du même texte entre les champs', () => {
+    expect(lineValuesKey({ ...VALID, label: 'a', unit: 'b' })).not.toBe(
+      lineValuesKey({ ...VALID, label: 'ab', unit: '' })
+    );
   });
 });

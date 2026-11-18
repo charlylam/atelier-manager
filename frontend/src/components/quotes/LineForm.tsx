@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import Link from 'next/link';
 import { Field, FIELD_CLASS, invalidProps } from '@/components/form/Field';
-import { lineInitialState } from '@/lib/line-form';
+import { lineInitialState, lineValuesKey } from '@/lib/line-form';
 import type { LineFormState, LineFormValues } from '@/lib/line-form';
 import { QUOTE_LINE_TYPE_LABELS } from '@/lib/labels';
 
@@ -17,7 +17,13 @@ type Props = {
 
 const TYPES = ['material', 'labor', 'service', 'other'] as const;
 
-export function LineForm({
+// Enveloppe : la clé recrée le formulaire, donc son état, quand les valeurs initiales changent.
+// Tant qu'elles sont identiques (par exemple après un refus du serveur), la saisie est conservée.
+export function LineForm(props: Props) {
+  return <LineFormBody key={lineValuesKey(props.initialValues)} {...props} />;
+}
+
+function LineFormBody({
   action,
   initialValues,
   submitLabel,
