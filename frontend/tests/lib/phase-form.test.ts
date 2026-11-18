@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  EMPTY_PHASE_VALUES,
   PHASE_FIELD_MESSAGES,
   isValidHours,
   phaseFieldErrorsFromApi,
   phaseValuesFromPhase,
+  phaseValuesKey,
   toUpdatePhasePayload,
   phaseValuesFromFormData,
   toCreatePhasePayload,
@@ -140,4 +142,35 @@ describe('isValidHours', () => {
       expect(isValidHours(hours)).toBe(false);
     }
   );
+});
+
+describe('phaseValuesKey', () => {
+  it('est identique pour des valeurs identiques, quel que soit l’ordre des propriétés', () => {
+    const reordered = { notes: '', estimatedHours: '', name: 'Ponçage' };
+
+    expect(phaseValuesKey(VALID)).toBe(phaseValuesKey({ ...VALID }));
+    expect(phaseValuesKey(VALID)).toBe(phaseValuesKey(reordered));
+  });
+
+  it('est identique à chaque appel avec les valeurs par défaut de l’ajout', () => {
+    expect(phaseValuesKey(EMPTY_PHASE_VALUES)).toBe(
+      phaseValuesKey({ ...EMPTY_PHASE_VALUES })
+    );
+  });
+
+  it.each([
+    ['name', 'Autre nom'],
+    ['estimatedHours', '7.5'],
+    ['notes', 'Autres notes'],
+  ] as const)('change quand %s change', (field, value) => {
+    expect(phaseValuesKey({ ...VALID, [field]: value })).not.toBe(
+      phaseValuesKey(VALID)
+    );
+  });
+
+  it('ne confond pas deux répartitions différentes du même texte entre les champs', () => {
+    expect(phaseValuesKey({ ...VALID, name: 'a', notes: 'b' })).not.toBe(
+      phaseValuesKey({ ...VALID, name: 'ab', notes: '' })
+    );
+  });
 });

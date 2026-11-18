@@ -37,6 +37,18 @@ export const QUOTE_FIELD_MESSAGES: Record<QuoteField, string> = {
 export const NOT_DRAFT_MESSAGE =
   'Ce devis n’est plus un brouillon : il ne peut plus être modifié.';
 
+/**
+ * Clé qui change quand les valeurs initiales du formulaire changent. L'état d'un formulaire
+ * (useActionState) n'est lu depuis les props qu'au premier rendu de l'instance, et Next.js garde
+ * une page quittée montée (Activity) : sans cette clé, un formulaire rouvert après un
+ * enregistrement garde les anciennes valeurs. Les champs sont lus dans l'ordre de QUOTE_FIELDS,
+ * indépendant de l'ordre des propriétés de l'objet. La liste des clients proposés n'en fait pas
+ * partie : ce n'est pas une valeur du formulaire.
+ */
+export function quoteValuesKey(values: QuoteFormValues) {
+  return JSON.stringify(QUOTE_FIELDS.map((field) => values[field]));
+}
+
 export function quoteInitialState(
   values: QuoteFormValues = EMPTY_QUOTE_VALUES
 ): QuoteFormState {

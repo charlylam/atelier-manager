@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { initialState } from '@/lib/client-form';
+import { clientValuesKey, initialState } from '@/lib/client-form';
 import type {
   ClientField,
   ClientFormState,
@@ -55,7 +55,15 @@ function Field({
   );
 }
 
-export function ClientForm({
+// Enveloppe : la clé recrée le formulaire, donc son état, quand les valeurs initiales changent.
+// Tant qu'elles sont identiques (par exemple après un refus du serveur), la saisie est conservée.
+export function ClientForm(props: Props) {
+  return (
+    <ClientFormBody key={clientValuesKey(props.initialValues)} {...props} />
+  );
+}
+
+function ClientFormBody({
   action,
   initialValues,
   submitLabel,

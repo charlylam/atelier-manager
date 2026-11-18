@@ -4,6 +4,7 @@ import {
   QUOTE_FIELD_MESSAGES,
   quoteFieldErrorsFromApi,
   quoteValuesFromFormData,
+  quoteValuesKey,
   quoteValuesFromQuote,
   toCreateQuotePayload,
   toUpdateQuotePayload,
@@ -131,5 +132,36 @@ describe('quoteFieldErrorsFromApi', () => {
     ).toEqual({
       validUntil: QUOTE_FIELD_MESSAGES.validUntil,
     });
+  });
+});
+
+describe('quoteValuesKey', () => {
+  it('est identique pour des valeurs identiques, quel que soit l’ordre des propriétés', () => {
+    const reordered = {
+      validUntil: '',
+      description: '',
+      title: 'Bibliothèque',
+      clientId: '3',
+    };
+
+    expect(quoteValuesKey(VALID)).toBe(quoteValuesKey({ ...VALID }));
+    expect(quoteValuesKey(VALID)).toBe(quoteValuesKey(reordered));
+  });
+
+  it.each([
+    ['clientId', '4'],
+    ['title', 'Autre titre'],
+    ['description', 'Autre description'],
+    ['validUntil', '2027-01-15'],
+  ] as const)('change quand %s change', (field, value) => {
+    expect(quoteValuesKey({ ...VALID, [field]: value })).not.toBe(
+      quoteValuesKey(VALID)
+    );
+  });
+
+  it('ne confond pas deux répartitions différentes du même texte entre les champs', () => {
+    expect(quoteValuesKey({ ...VALID, title: 'a', description: 'b' })).not.toBe(
+      quoteValuesKey({ ...VALID, title: 'ab', description: '' })
+    );
   });
 });

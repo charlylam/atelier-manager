@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { DeletePhaseForm } from '@/components/worksites/DeletePhaseForm';
 import { PhaseForm } from '@/components/worksites/PhaseForm';
 import { EMPTY_PHASE_VALUES, PHASE_FIELD_MESSAGES } from '@/lib/phase-form';
-import type { PhaseFormState } from '@/lib/phase-form';
+import type { PhaseFormState, PhaseFormValues } from '@/lib/phase-form';
 
 type Action = (
   state: PhaseFormState,
@@ -107,6 +107,99 @@ describe('PhaseForm', () => {
     );
     expect(screen.getByLabelText('Nom')).toHaveValue('Usinage');
     expect(screen.getByLabelText('Heures estimées')).toHaveValue(12.5);
+  });
+
+  describe('quand les valeurs initiales changent', () => {
+    const VALUES_A: PhaseFormValues = {
+      name: 'Ponçage',
+      estimatedHours: '7.5',
+      notes: 'Grain 120',
+    };
+    const VALUES_B: PhaseFormValues = {
+      name: 'Vernissage',
+      estimatedHours: '12',
+      notes: 'Deux couches',
+    };
+
+    function formWith(
+      values: PhaseFormValues,
+      action: Action = vi.fn<Action>(async (state) => state)
+    ) {
+      return (
+        <PhaseForm
+          action={action}
+          initialValues={values}
+          submitLabel="Enregistrer"
+          pendingLabel="Enregistrement…"
+          cancelHref="/chantiers/4"
+        />
+      );
+    }
+
+    it('affiche les nouvelles valeurs (valeurs A, puis valeurs B)', () => {
+      const { rerender } = render(formWith(VALUES_A));
+      expect(screen.getByLabelText('Nom')).toHaveValue('Ponçage');
+
+      rerender(formWith(VALUES_B));
+
+      expect(screen.getByLabelText('Nom')).toHaveValue('Vernissage');
+      expect(screen.getByLabelText('Heures estimées')).toHaveValue(12);
+      expect(screen.getByLabelText('Notes')).toHaveValue('Deux couches');
+    });
+
+    it('remplace les valeurs affichées par un état issu d’un envoi précédent', async () => {
+      // Le formulaire a renvoyé un état (refus) avec ses propres valeurs, puis les données changent.
+      const refuse = vi.fn<Action>(async () => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: {},
+        values: { ...VALUES_A, name: 'Saisie refusée' },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A, refuse));
+      await user.click(screen.getByRole('button', { name: 'Enregistrer' }));
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+      expect(screen.getByLabelText('Nom')).toHaveValue('Saisie refusée');
+
+      rerender(formWith(VALUES_B, refuse));
+
+      expect(screen.getByLabelText('Nom')).toHaveValue('Vernissage');
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('conserve la saisie tant que les valeurs initiales sont identiques', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A));
+
+      await user.clear(screen.getByLabelText('Nom'));
+      await user.type(screen.getByLabelText('Nom'), 'Brouillon en cours');
+      // Nouvel objet, même contenu : ce que renvoie la page à chaque rendu.
+      rerender(formWith({ ...VALUES_A }));
+
+      expect(screen.getByLabelText('Nom')).toHaveValue('Brouillon en cours');
+    });
+
+    it('conserve la saisie et l’erreur après un refus du serveur', async () => {
+      const refuse = vi.fn<Action>(async (_state, formData) => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: { estimatedHours: PHASE_FIELD_MESSAGES.estimatedHours },
+        values: { ...VALUES_A, name: String(formData.get('name')) },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A, refuse));
+
+      await user.clear(screen.getByLabelText('Nom'));
+      await user.type(screen.getByLabelText('Nom'), 'Phase refusée');
+      await user.click(screen.getByRole('button', { name: 'Enregistrer' }));
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+
+      rerender(formWith({ ...VALUES_A }, refuse));
+
+      expect(screen.getByLabelText('Nom')).toHaveValue('Phase refusée');
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('Heures estimées')
+      ).toHaveAccessibleDescription(PHASE_FIELD_MESSAGES.estimatedHours);
+    });
   });
 });
 

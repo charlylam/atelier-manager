@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QuoteForm } from '@/components/quotes/QuoteForm';
 import { EMPTY_QUOTE_VALUES, QUOTE_FIELD_MESSAGES } from '@/lib/quote-form';
-import type { QuoteFormState } from '@/lib/quote-form';
+import type { QuoteFormState, QuoteFormValues } from '@/lib/quote-form';
 
 type Action = (
   state: QuoteFormState,
@@ -121,5 +121,116 @@ describe('QuoteForm', () => {
     );
     expect(screen.getByLabelText('Client')).toHaveValue('3');
     expect(screen.getByLabelText('Titre')).toHaveValue('Bibliothèque');
+  });
+
+  describe('quand les valeurs initiales changent', () => {
+    const VALUES_A: QuoteFormValues = {
+      clientId: '3',
+      title: 'Bibliothèque',
+      description: 'Chêne massif',
+      validUntil: '2026-12-31',
+    };
+    const VALUES_B: QuoteFormValues = {
+      clientId: '4',
+      title: 'Porte d’entrée',
+      description: 'Vitrée',
+      validUntil: '2027-01-15',
+    };
+
+    function formWith(
+      values: QuoteFormValues,
+      action: Action = vi.fn<Action>(async (state) => state)
+    ) {
+      return (
+        <QuoteForm
+          action={action}
+          initialValues={values}
+          clients={CLIENTS}
+          submitLabel="Enregistrer"
+          pendingLabel="Enregistrement…"
+          cancelHref="/devis/7"
+        />
+      );
+    }
+
+    it('affiche les nouvelles valeurs (valeurs A, puis valeurs B)', () => {
+      const { rerender } = render(formWith(VALUES_A));
+      expect(screen.getByLabelText('Client')).toHaveValue('3');
+
+      rerender(formWith(VALUES_B));
+
+      expect(screen.getByLabelText('Client')).toHaveValue('4');
+      expect(screen.getByLabelText('Titre')).toHaveValue('Porte d’entrée');
+      expect(screen.getByLabelText('Description')).toHaveValue('Vitrée');
+      expect(screen.getByLabelText('Valable jusqu’au')).toHaveValue(
+        '2027-01-15'
+      );
+    });
+
+    it('remplace les valeurs affichées par un état issu d’un envoi précédent', async () => {
+      // Le formulaire a renvoyé un état (refus) avec ses propres valeurs, puis les données changent.
+      const refuse = vi.fn<Action>(async () => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: {},
+        values: { ...VALUES_A, clientId: '4', description: 'Saisie refusée' },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A, refuse));
+      await user.click(screen.getByRole('button', { name: 'Enregistrer' }));
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+      expect(screen.getByLabelText('Description')).toHaveValue(
+        'Saisie refusée'
+      );
+      expect(screen.getByLabelText('Client')).toHaveValue('4');
+
+      rerender(formWith({ ...VALUES_B, clientId: '3' }, refuse));
+
+      expect(screen.getByLabelText('Description')).toHaveValue('Vitrée');
+      expect(screen.getByLabelText('Client')).toHaveValue('3');
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('conserve la saisie tant que les valeurs initiales sont identiques', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A));
+
+      await user.clear(screen.getByLabelText('Titre'));
+      await user.type(screen.getByLabelText('Titre'), 'Brouillon en cours');
+      await user.selectOptions(screen.getByLabelText('Client'), '4');
+      // Nouvel objet, même contenu : ce que renvoie la page à chaque rendu.
+      rerender(formWith({ ...VALUES_A }));
+
+      expect(screen.getByLabelText('Titre')).toHaveValue('Brouillon en cours');
+      expect(screen.getByLabelText('Client')).toHaveValue('4');
+    });
+
+    it('conserve la saisie et l’erreur après un refus du serveur', async () => {
+      const refuse = vi.fn<Action>(async (_state, formData) => ({
+        message: 'Certaines informations sont invalides. Vérifiez les champs.',
+        fieldErrors: { validUntil: QUOTE_FIELD_MESSAGES.validUntil },
+        values: {
+          ...VALUES_A,
+          clientId: String(formData.get('clientId')),
+          title: String(formData.get('title')),
+        },
+      }));
+      const user = userEvent.setup();
+      const { rerender } = render(formWith(VALUES_A, refuse));
+
+      await user.clear(screen.getByLabelText('Titre'));
+      await user.type(screen.getByLabelText('Titre'), 'Brouillon refusé');
+      await user.selectOptions(screen.getByLabelText('Client'), '4');
+      await user.click(screen.getByRole('button', { name: 'Enregistrer' }));
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+
+      rerender(formWith({ ...VALUES_A }, refuse));
+
+      expect(screen.getByLabelText('Titre')).toHaveValue('Brouillon refusé');
+      expect(screen.getByLabelText('Client')).toHaveValue('4');
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('Valable jusqu’au')
+      ).toHaveAccessibleDescription(QUOTE_FIELD_MESSAGES.validUntil);
+    });
   });
 });

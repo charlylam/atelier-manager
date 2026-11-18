@@ -50,6 +50,17 @@ export const LINE_FIELD_MESSAGES: Record<LineField, string> = {
     'Taux de TVA invalide : un nombre de 0 à 99,99, avec 2 décimales au plus.',
 };
 
+/**
+ * Clé qui change quand les valeurs initiales du formulaire changent. L'état d'un formulaire
+ * (useActionState) n'est lu depuis les props qu'au premier rendu de l'instance, et Next.js garde
+ * une page quittée montée (Activity) : sans cette clé, un formulaire rouvert après un
+ * enregistrement garde les anciennes valeurs. Les champs sont lus dans l'ordre de LINE_FIELDS,
+ * indépendant de l'ordre des propriétés de l'objet.
+ */
+export function lineValuesKey(values: LineFormValues) {
+  return JSON.stringify(LINE_FIELDS.map((field) => values[field]));
+}
+
 export function lineInitialState(
   values: LineFormValues = DEFAULT_LINE_VALUES
 ): LineFormState {

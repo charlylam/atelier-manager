@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   EMPTY_VALUES,
   FIELD_MESSAGES,
+  clientValuesKey,
   fieldErrorsFromApi,
   toCreatePayload,
   toUpdatePayload,
@@ -137,5 +138,46 @@ describe('fieldErrorsFromApi', () => {
   it('ignore les champs inconnus et l’absence de détail', () => {
     expect(fieldErrorsFromApi([{ path: 'inconnu', message: 'x' }])).toEqual({});
     expect(fieldErrorsFromApi(undefined)).toEqual({});
+  });
+});
+
+describe('clientValuesKey', () => {
+  const VALUES = {
+    ...EMPTY_VALUES,
+    name: 'Famille Durand',
+    email: 'durand@example.test',
+  };
+
+  it('est identique pour des valeurs identiques, quel que soit l’ordre des propriétés', () => {
+    const reordered = {
+      notes: '',
+      address: '',
+      phone: '',
+      email: 'durand@example.test',
+      isCompany: 'false' as const,
+      name: 'Famille Durand',
+    };
+
+    expect(clientValuesKey(VALUES)).toBe(clientValuesKey({ ...VALUES }));
+    expect(clientValuesKey(VALUES)).toBe(clientValuesKey(reordered));
+  });
+
+  it.each([
+    ['name', 'Autre nom'],
+    ['isCompany', 'true'],
+    ['email', 'autre@example.test'],
+    ['phone', '06'],
+    ['address', 'autre adresse'],
+    ['notes', 'autres notes'],
+  ] as const)('change quand %s change', (field, value) => {
+    expect(clientValuesKey({ ...VALUES, [field]: value })).not.toBe(
+      clientValuesKey(VALUES)
+    );
+  });
+
+  it('ne confond pas deux répartitions différentes du même texte entre les champs', () => {
+    expect(clientValuesKey({ ...VALUES, name: 'a', email: 'b' })).not.toBe(
+      clientValuesKey({ ...VALUES, name: 'ab', email: '' })
+    );
   });
 });
