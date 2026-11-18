@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import type { StatusActionState } from '@/lib/quote-status-ui';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (state: StatusActionState) => Promise<StatusActionState>;
@@ -15,14 +16,16 @@ export function PhaseStatusForm({ action, label, name }: Props) {
 
   return (
     <form action={formAction} className="flex flex-col items-end gap-1">
-      <button
+      <Button
         type="submit"
-        disabled={pending}
         aria-label={`${label} la phase ${name}`}
-        className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm disabled:opacity-60"
+        variant="secondary"
+        size="sm"
+        disabled={pending}
+        className="disabled:opacity-60"
       >
         {label}
-      </button>
+      </Button>
       {state.message && (
         <p
           role="alert"

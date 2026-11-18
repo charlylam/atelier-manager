@@ -20,6 +20,7 @@ import {
   movePhaseAction,
 } from '../phase-actions';
 import { changeWorksiteStatusAction } from '../status-actions';
+import { buttonClasses } from '@/components/Button';
 
 type Params = Promise<{ id: string }>;
 
@@ -72,7 +73,7 @@ async function WorksiteContent({ params }: { params: Params }) {
         canEditWorksite(worksite.status) && (
           <Link
             href={`/chantiers/${worksite.id}/modifier`}
-            className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm"
+            className={buttonClasses({ variant: 'secondary', size: 'sm' })}
           >
             Modifier
           </Link>
