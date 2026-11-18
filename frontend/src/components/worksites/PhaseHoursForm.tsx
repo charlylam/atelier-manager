@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import type { PhaseHoursState } from '@/lib/phase-progress';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (
@@ -39,14 +40,16 @@ export function PhaseHoursForm({ action, initialValue, name }: Props) {
           aria-invalid={state.message ? true : undefined}
           className="w-24 rounded-md border border-neutral-300 dark:border-neutral-700 px-2 py-1 text-sm"
         />
-        <button
+        <Button
           type="submit"
-          disabled={pending}
           aria-label={`Enregistrer les heures réelles de la phase ${name}`}
-          className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm disabled:opacity-60"
+          variant="secondary"
+          size="sm"
+          disabled={pending}
+          className="disabled:opacity-60"
         >
           Enregistrer
-        </button>
+        </Button>
       </div>
       {state.message && (
         <p

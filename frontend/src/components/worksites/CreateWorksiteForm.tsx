@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import type { StatusActionState } from '@/lib/quote-status-ui';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (state: StatusActionState) => Promise<StatusActionState>;
@@ -23,13 +24,15 @@ export function CreateWorksiteForm({ action }: Props) {
         </p>
       )}
 
-      <button
+      <Button
         type="submit"
+        variant="neutral"
+        size="md"
         disabled={pending}
-        className="self-start rounded-md bg-neutral-900 dark:bg-neutral-100 px-4 py-2 text-sm font-medium text-white dark:text-neutral-900 disabled:opacity-60"
+        className="self-start text-sm font-medium disabled:opacity-60"
       >
         {pending ? 'Ouverture…' : 'Créer ou ouvrir le chantier'}
-      </button>
+      </Button>
     </form>
   );
 }

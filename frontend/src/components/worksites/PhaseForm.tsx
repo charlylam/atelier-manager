@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Field, FIELD_CLASS, invalidProps } from '@/components/form/Field';
 import { phaseInitialState, phaseValuesKey } from '@/lib/phase-form';
 import type { PhaseFormState, PhaseFormValues } from '@/lib/phase-form';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (
@@ -98,13 +99,15 @@ function PhaseFormBody({
       </Field>
 
       <div className="flex items-center gap-4">
-        <button
+        <Button
           type="submit"
+          variant="primary"
+          size="md"
           disabled={pending}
-          className="rounded-md bg-emerald-800 px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="font-medium disabled:opacity-60"
         >
           {pending ? pendingLabel : submitLabel}
-        </button>
+        </Button>
         {cancelHref && (
           <Link href={cancelHref} className="text-sm underline">
             Annuler

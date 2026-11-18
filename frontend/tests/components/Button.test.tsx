@@ -98,6 +98,19 @@ describe('Button : classes', () => {
       { exact: true }
     );
   });
+
+  it('secondary + xs', () => {
+    render(
+      <Button type="submit" variant="secondary" size="xs">
+        Monter
+      </Button>
+    );
+
+    expect(screen.getByRole('button', { name: 'Monter' })).toHaveClass(
+      'rounded-md border border-neutral-300 dark:border-neutral-700 px-2 py-1 text-sm',
+      { exact: true }
+    );
+  });
 });
 
 describe('buttonClasses', () => {

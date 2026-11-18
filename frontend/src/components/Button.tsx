@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react';
 
 type Variant = 'primary' | 'secondary' | 'neutral' | 'danger';
-type Size = 'md' | 'sm';
+type Size = 'md' | 'sm' | 'xs';
 
 type ClassOptions = {
   variant: Variant;
@@ -24,6 +24,7 @@ const VARIANTS: Record<Variant, string> = {
 const SIZES: Record<Size, string> = {
   md: 'px-4 py-2',
   sm: 'px-3 py-1 text-sm',
+  xs: 'px-2 py-1 text-sm',
 };
 
 /**

@@ -8,6 +8,7 @@ import type {
   WorksiteFormState,
   WorksiteFormValues,
 } from '@/lib/worksite-form';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (
@@ -108,13 +109,15 @@ function WorksiteFormBody({ action, initialValues, cancelHref }: Props) {
       </Field>
 
       <div className="flex items-center gap-4">
-        <button
+        <Button
           type="submit"
+          variant="primary"
+          size="md"
           disabled={pending}
-          className="rounded-md bg-emerald-800 px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="font-medium disabled:opacity-60"
         >
           {pending ? 'Enregistrement…' : 'Enregistrer'}
-        </button>
+        </Button>
         <Link href={cancelHref} className="text-sm underline">
           Annuler
         </Link>
