@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import type { StatusActionState } from '@/lib/quote-status-ui';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (state: StatusActionState) => Promise<StatusActionState>;
@@ -22,13 +23,15 @@ export function DuplicateForm({ action }: Props) {
         </p>
       )}
 
-      <button
+      <Button
         type="submit"
+        variant="secondary"
+        size="md"
         disabled={pending}
-        className="self-start rounded-md border border-neutral-300 dark:border-neutral-700 px-4 py-2 text-sm font-medium disabled:opacity-60"
+        className="self-start text-sm font-medium disabled:opacity-60"
       >
         {pending ? 'Copie en cours…' : 'Dupliquer ce devis'}
-      </button>
+      </Button>
     </form>
   );
 }

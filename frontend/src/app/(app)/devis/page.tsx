@@ -8,6 +8,7 @@ import { firstValue, parsePage, parseSearch } from '@/lib/params';
 import { parseQuoteStatus } from '@/lib/quote-params';
 import { listQuotes } from '@/lib/quotes';
 import { orLogin } from '@/lib/session-guard';
+import { buttonClasses } from '@/components/Button';
 
 type SearchParams = Promise<{
   search?: string | string[];
@@ -26,7 +27,11 @@ export default function QuotesPage({
         <h1 className="text-2xl font-semibold">Devis</h1>
         <Link
           href="/devis/nouveau"
-          className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-medium text-white"
+          className={buttonClasses({
+            variant: 'primary',
+            size: 'md',
+            className: 'text-sm font-medium',
+          })}
         >
           Nouveau devis
         </Link>

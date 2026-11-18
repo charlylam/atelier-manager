@@ -16,11 +16,9 @@ import {
   changeQuoteStatusAction,
   duplicateQuoteAction,
 } from '../status-actions';
+import { buttonClasses } from '@/components/Button';
 
 type Params = Promise<{ id: string }>;
-
-const BUTTON =
-  'rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm';
 
 export default function QuotePage({ params }: { params: Params }) {
   return (
@@ -61,12 +59,18 @@ async function QuoteContent({ params }: { params: Params }) {
       actions={
         <>
           {editable && (
-            <Link href={`/devis/${quote.id}/modifier`} className={BUTTON}>
+            <Link
+              href={`/devis/${quote.id}/modifier`}
+              className={buttonClasses({ variant: 'secondary', size: 'sm' })}
+            >
               Modifier
             </Link>
           )}
           {/* Lien ordinaire : le PDF est servi par un Route Handler, pas par une page. */}
-          <a href={`/devis/${quote.id}/pdf`} className={BUTTON}>
+          <a
+            href={`/devis/${quote.id}/pdf`}
+            className={buttonClasses({ variant: 'secondary', size: 'sm' })}
+          >
             Télécharger le PDF
           </a>
         </>

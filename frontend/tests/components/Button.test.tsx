@@ -62,6 +62,42 @@ describe('Button : classes', () => {
       { exact: true }
     );
   });
+
+  it('neutral + md avec className', () => {
+    render(
+      <Button
+        type="submit"
+        variant="neutral"
+        size="md"
+        className="self-start text-sm font-medium disabled:opacity-60"
+      >
+        Confirmer
+      </Button>
+    );
+
+    expect(screen.getByRole('button', { name: 'Confirmer' })).toHaveClass(
+      'rounded-md bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 px-4 py-2 self-start text-sm font-medium disabled:opacity-60',
+      { exact: true }
+    );
+  });
+
+  it('danger + md avec className', () => {
+    render(
+      <Button
+        type="submit"
+        variant="danger"
+        size="md"
+        className="self-start text-sm font-medium disabled:opacity-60"
+      >
+        Supprimer
+      </Button>
+    );
+
+    expect(screen.getByRole('button', { name: 'Supprimer' })).toHaveClass(
+      'rounded-md bg-red-800 text-white px-4 py-2 self-start text-sm font-medium disabled:opacity-60',
+      { exact: true }
+    );
+  });
 });
 
 describe('buttonClasses', () => {
