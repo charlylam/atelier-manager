@@ -33,6 +33,17 @@ export const PHASE_FIELD_MESSAGES: Record<PhaseField, string> = {
 export const PHASE_STRUCTURE_MESSAGE =
   'Les phases ne peuvent être modifiées que pour un chantier en attente ou en fabrication.';
 
+/**
+ * Clé qui change quand les valeurs initiales du formulaire changent. L'état d'un formulaire
+ * (useActionState) n'est lu depuis les props qu'au premier rendu de l'instance, et Next.js garde
+ * une page quittée montée (Activity) : sans cette clé, un formulaire rouvert après un
+ * enregistrement garde les anciennes valeurs. Les champs sont lus dans l'ordre de PHASE_FIELDS,
+ * indépendant de l'ordre des propriétés de l'objet.
+ */
+export function phaseValuesKey(values: PhaseFormValues) {
+  return JSON.stringify(PHASE_FIELDS.map((field) => values[field]));
+}
+
 export function phaseInitialState(
   values: PhaseFormValues = EMPTY_PHASE_VALUES
 ): PhaseFormState {

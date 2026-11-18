@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import Link from 'next/link';
 import { Field, FIELD_CLASS, invalidProps } from '@/components/form/Field';
-import { phaseInitialState } from '@/lib/phase-form';
+import { phaseInitialState, phaseValuesKey } from '@/lib/phase-form';
 import type { PhaseFormState, PhaseFormValues } from '@/lib/phase-form';
 
 type Props = {
@@ -17,7 +17,13 @@ type Props = {
   cancelHref?: string;
 };
 
-export function PhaseForm({
+// Enveloppe : la clé recrée le formulaire, donc son état, quand les valeurs initiales changent.
+// Tant qu'elles sont identiques (par exemple après un refus du serveur), la saisie est conservée.
+export function PhaseForm(props: Props) {
+  return <PhaseFormBody key={phaseValuesKey(props.initialValues)} {...props} />;
+}
+
+function PhaseFormBody({
   action,
   initialValues,
   submitLabel,
