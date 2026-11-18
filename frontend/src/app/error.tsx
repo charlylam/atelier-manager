@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@/components/Button';
+
 export default function AppError({
   retry,
 }: {
@@ -12,13 +14,15 @@ export default function AppError({
       <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
         L’application n’a pas pu joindre l’API. Réessayez dans un instant.
       </p>
-      <button
+      <Button
         type="button"
+        variant="primary"
+        size="md"
         onClick={() => retry()}
-        className="mt-4 rounded-md bg-emerald-800 px-4 py-2 text-white"
+        className="mt-4"
       >
         Réessayer
-      </button>
+      </Button>
     </main>
   );
 }

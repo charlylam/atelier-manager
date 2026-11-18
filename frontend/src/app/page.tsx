@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { buttonClasses } from '@/components/Button';
 
 export default function Home() {
   return (
@@ -11,13 +12,13 @@ export default function Home() {
       <div className="flex gap-3">
         <Link
           href="/connexion"
-          className="rounded-md bg-emerald-800 px-4 py-2 text-white"
+          className={buttonClasses({ variant: 'primary', size: 'md' })}
         >
           Se connecter
         </Link>
         <Link
           href="/inscription"
-          className="rounded-md border border-neutral-300 dark:border-neutral-700 px-4 py-2"
+          className={buttonClasses({ variant: 'secondary', size: 'md' })}
         >
           Créer mon atelier
         </Link>

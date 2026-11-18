@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/Button';
 
 export function LogoutButton() {
   const router = useRouter();
@@ -21,13 +22,15 @@ export function LogoutButton() {
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="secondary"
+      size="sm"
       onClick={handleClick}
       disabled={pending}
-      className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm disabled:opacity-60"
+      className="disabled:opacity-60"
     >
       Se déconnecter
-    </button>
+    </Button>
   );
 }
