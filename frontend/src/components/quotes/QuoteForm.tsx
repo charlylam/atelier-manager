@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import Link from 'next/link';
 import { Field, FIELD_CLASS, invalidProps } from '@/components/form/Field';
-import { quoteInitialState } from '@/lib/quote-form';
+import { quoteInitialState, quoteValuesKey } from '@/lib/quote-form';
 import type { QuoteFormState, QuoteFormValues } from '@/lib/quote-form';
 
 type ClientOption = { id: number; code: string; name: string };
@@ -20,7 +20,14 @@ type Props = {
   cancelHref: string;
 };
 
-export function QuoteForm({
+// Enveloppe : la clé recrée le formulaire, donc son état, quand les valeurs initiales changent.
+// Tant qu'elles sont identiques (par exemple après un refus du serveur), la saisie est conservée.
+// La liste des clients proposés ne compte pas dans la clé : ce n'est pas une valeur du formulaire.
+export function QuoteForm(props: Props) {
+  return <QuoteFormBody key={quoteValuesKey(props.initialValues)} {...props} />;
+}
+
+function QuoteFormBody({
   action,
   initialValues,
   clients,
