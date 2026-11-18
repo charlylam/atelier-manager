@@ -5,6 +5,7 @@ import type { FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { messageForCode } from '@/lib/messages';
+import { Button } from '@/components/Button';
 
 type Props = {
   redirectTo: string;
@@ -92,13 +93,15 @@ export function LoginForm({ redirectTo, sessionExpired = false }: Props) {
         </p>
       )}
 
-      <button
+      <Button
         type="submit"
+        variant="primary"
+        size="md"
         disabled={pending}
-        className="rounded-md bg-emerald-800 px-4 py-2 font-medium text-white disabled:opacity-60"
+        className="font-medium disabled:opacity-60"
       >
         {pending ? 'Connexion…' : 'Se connecter'}
-      </button>
+      </Button>
 
       <p className="text-center text-sm">
         Pas encore d’atelier ?{' '}

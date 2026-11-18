@@ -5,6 +5,7 @@ import type { FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { messageForCode } from '@/lib/messages';
+import { Button } from '@/components/Button';
 
 const FIELD_CLASS =
   'rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-base font-normal';
@@ -125,13 +126,15 @@ export function RegisterForm() {
         </p>
       )}
 
-      <button
+      <Button
         type="submit"
+        variant="primary"
+        size="md"
         disabled={pending}
-        className="rounded-md bg-emerald-800 px-4 py-2 font-medium text-white disabled:opacity-60"
+        className="font-medium disabled:opacity-60"
       >
         {pending ? 'Création…' : 'Créer mon atelier'}
-      </button>
+      </Button>
 
       <p className="text-center text-sm">
         Déjà un compte ?{' '}
