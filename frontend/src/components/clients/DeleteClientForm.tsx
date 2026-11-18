@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import type { DeleteClientState } from '@/app/(app)/clients/actions';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (state: DeleteClientState) => Promise<DeleteClientState>;
@@ -33,13 +34,15 @@ export function DeleteClientForm({ action, clientName }: Props) {
           </p>
         )}
 
-        <button
+        <Button
           type="submit"
+          variant="danger"
+          size="md"
           disabled={pending}
-          className="self-start rounded-md bg-red-800 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          className="self-start text-sm font-medium disabled:opacity-60"
         >
           {pending ? 'Suppression…' : 'Confirmer la suppression'}
-        </button>
+        </Button>
       </form>
     </details>
   );

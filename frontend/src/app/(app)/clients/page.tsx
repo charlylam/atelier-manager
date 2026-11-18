@@ -6,6 +6,7 @@ import { Pagination } from '@/components/Pagination';
 import { listClients } from '@/lib/clients';
 import { firstValue, parsePage, parseSearch } from '@/lib/params';
 import { orLogin } from '@/lib/session-guard';
+import { buttonClasses } from '@/components/Button';
 
 type SearchParams = Promise<{
   search?: string | string[];
@@ -23,7 +24,11 @@ export default function ClientsPage({
         <h1 className="text-2xl font-semibold">Clients</h1>
         <Link
           href="/clients/nouveau"
-          className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-medium text-white"
+          className={buttonClasses({
+            variant: 'primary',
+            size: 'md',
+            className: 'text-sm font-medium',
+          })}
         >
           Nouveau client
         </Link>

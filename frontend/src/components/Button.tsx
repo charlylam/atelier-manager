@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-type Variant = 'primary' | 'secondary';
+type Variant = 'primary' | 'secondary' | 'neutral' | 'danger';
 type Size = 'md' | 'sm';
 
 type ClassOptions = {
@@ -16,6 +16,9 @@ const BASE = 'rounded-md';
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-emerald-800 text-white',
   secondary: 'border border-neutral-300 dark:border-neutral-700',
+  neutral:
+    'bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900',
+  danger: 'bg-red-800 text-white',
 };
 
 const SIZES: Record<Size, string> = {

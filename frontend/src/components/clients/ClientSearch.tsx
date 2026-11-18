@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Button } from '@/components/Button';
 
 // Formulaire GET : il fonctionne sans JavaScript et remet la pagination à la page 1.
 export function ClientSearch({ search }: { search?: string }) {
@@ -21,12 +22,14 @@ export function ClientSearch({ search }: { search?: string }) {
         placeholder="Rechercher par nom"
         className="w-64 rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-sm"
       />
-      <button
+      <Button
         type="submit"
-        className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-medium text-white"
+        variant="primary"
+        size="md"
+        className="text-sm font-medium"
       >
         Rechercher
-      </button>
+      </Button>
       {search && (
         <Link
           href="/clients"

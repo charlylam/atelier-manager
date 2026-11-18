@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { QuoteStatus } from '@/lib/labels';
 import { pageHref } from '@/lib/pagination';
+import { Button } from '@/components/Button';
 
 // Formulaire GET : il fonctionne sans JavaScript, garde le filtre de statut (champ caché)
 // et remet la pagination à la page 1.
@@ -31,12 +32,14 @@ export function QuoteSearch({
         className="w-64 rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-sm"
       />
       {status && <input type="hidden" name="status" value={status} />}
-      <button
+      <Button
         type="submit"
-        className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-medium text-white"
+        variant="primary"
+        size="md"
+        className="text-sm font-medium"
       >
         Rechercher
-      </button>
+      </Button>
       {search && (
         <Link
           href={pageHref('/devis', { status }, 1)}

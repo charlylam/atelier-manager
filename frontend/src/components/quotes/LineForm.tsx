@@ -6,6 +6,7 @@ import { Field, FIELD_CLASS, invalidProps } from '@/components/form/Field';
 import { lineInitialState, lineValuesKey } from '@/lib/line-form';
 import type { LineFormState, LineFormValues } from '@/lib/line-form';
 import { QUOTE_LINE_TYPE_LABELS } from '@/lib/labels';
+import { Button } from '@/components/Button';
 
 type Props = {
   action: (state: LineFormState, formData: FormData) => Promise<LineFormState>;
@@ -151,13 +152,15 @@ function LineFormBody({
       </div>
 
       <div className="flex items-center gap-4">
-        <button
+        <Button
           type="submit"
+          variant="primary"
+          size="md"
           disabled={pending}
-          className="rounded-md bg-emerald-800 px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="font-medium disabled:opacity-60"
         >
           {pending ? pendingLabel : submitLabel}
-        </button>
+        </Button>
         {cancelHref && (
           <Link href={cancelHref} className="text-sm underline">
             Annuler

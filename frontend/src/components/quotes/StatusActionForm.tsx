@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import type { StatusActionState, StatusChange } from '@/lib/quote-status-ui';
+import { Button } from '@/components/Button';
 
 // Sert aussi aux chantiers : seuls les trois textes sont utilisés.
 type Change = Pick<StatusChange, 'label' | 'question' | 'confirmLabel'>;
@@ -32,13 +33,15 @@ export function StatusActionForm({ action, change }: Props) {
           </p>
         )}
 
-        <button
+        <Button
           type="submit"
+          variant="neutral"
+          size="md"
           disabled={pending}
-          className="self-start rounded-md bg-neutral-900 dark:bg-neutral-100 px-4 py-2 text-sm font-medium text-white dark:text-neutral-900 disabled:opacity-60"
+          className="self-start text-sm font-medium disabled:opacity-60"
         >
           {pending ? 'Enregistrement…' : change.confirmLabel}
-        </button>
+        </Button>
       </form>
     </details>
   );
